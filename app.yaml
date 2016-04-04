@@ -17,6 +17,13 @@ handlers:
 - url: /img
   static_dir: img
 
+- url: /templates
+  static_dir: templates
+
+- url: /testData/
+  script: testData.app
+  login: admin
+
 - url: .*
   script: main.app
 

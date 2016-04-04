@@ -14,6 +14,7 @@
 
 from credentials import API_KEY
 import webapp2
+import models
 
 
 class MainHandler(webapp2.RequestHandler):
