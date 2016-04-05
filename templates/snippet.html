@@ -1,0 +1,46 @@
+{% macro snippetStyle() -%}
+    <style>
+        .snippetEmbed {
+            float: left;
+            width: 400px;
+        }
+        .timeRange {
+            float: right;
+        }
+        .snippetPanel {
+            width: 900px;
+        }
+    </style>
+{%- endmacro %}
+
+
+{% macro youtubeThumbnail(videoId, num) -%}
+    <img class="videoThumbnail" src="http://img.youtube.com/vi/{{ videoId }}/{{ num }}.jpg">
+{%- endmacro %}
+
+
+{% macro youtubeEmbed(snpt) -%}
+    <iframe
+            class="snippetEmbed"
+            src="https://www.youtube.com/embed/{{ snpt.videoID }}?start={{ snpt.startTime }}&end={{ snpt.endTime }}&version=3"
+            frameborder="0"></iframe>
+{%- endmacro %}
+
+
+{% macro snippet(snpt, editable) -%}
+<div class="panel panel-default snippetPanel">
+  <div class="panel-heading">
+    <h3 class="panel-title">
+        <span>{{ snpt.title }}</span>
+    </h3>
+    <span class="timeRange">
+        startTime:{{ snpt.startTime }}
+        endTime: {{ snpt.endTime }}
+    </span>
+  </div>
+  <div class="panel-body">
+      {{ youtubeEmbed(snpt) }}
+      <div class="snippetNotes">{{ snpt.notes }}</div>
+  </div>
+</div>
+{%- endmacro %}

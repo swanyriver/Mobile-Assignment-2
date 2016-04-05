@@ -1,0 +1,20 @@
+{% extends "main.html" %}
+{% import "snippet.html" as snippet %}
+{% block title %} View All {% endblock %}
+{% block cssSource %} {{ snippet.snippetStyle() }} {% endblock %}
+{% block body %}
+    <style>
+        .odd {
+            background-color: #a6e1ec;
+        }
+    </style>
+    {% for p in playlists %}
+        <div class="playlist {{ loop.cycle('odd', 'even') }}">
+        <h2>{{ p.title }}</h2>
+            {% for s in p.snippets %}
+                {{ snippet.snippet(s, false) }}
+            {% endfor %}
+        </div>
+        <hr>
+    {% endfor %}
+{% endblock body %}

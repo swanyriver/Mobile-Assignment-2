@@ -2,14 +2,8 @@
 import webapp2
 import models
 from google.appengine.ext import ndb
-import jinja2
-import os
+import handler
 
-
-JINJA_ENVIRONMENT = jinja2.Environment(
-  loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
-  extensions=['jinja2.ext.autoescape'],
-  autoescape=True)
 
 # models.Snippet(
 #     title="",
@@ -23,9 +17,8 @@ JINJA_ENVIRONMENT = jinja2.Environment(
 TESTING_KEY = "TESTING"
 
 
-class MainHandler(webapp2.RequestHandler):
+class MainHandler(handler.handler):
     def get(self):
-        self.response.headers['Content-Type'] = 'text/plain'
 
         # obliterate testing data
         pKey = ndb.Key(models.Playlist, TESTING_KEY)
@@ -110,9 +103,12 @@ class MainHandler(webapp2.RequestHandler):
         playlists[0].put()
 
         # display them with jinja template
-        for p in playlists: self.response.write(p.toString() + "\n------------------------------------------------\n")
 
-        self.response.write("Testing Data populated")
+        self.render("viewAll.html", var={"playlists": playlists})
+        #for p in playlists: self.response.write(p.toString() + "\n------------------------------------------------\n")
+
+        #self.response.write("Testing Data populated")
+
 app = webapp2.WSGIApplication([
     ('/testData/', MainHandler)
 ], debug=True)

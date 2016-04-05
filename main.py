@@ -15,12 +15,16 @@
 from credentials import API_KEY
 import webapp2
 import handler
-
+import models
 
 class MainHandler(handler.handler):
     def get(self):
-        self.render("main.html")
-
+        #self.render("main.html")
+        self.response.headers['Content-Type'] = 'text/plain'
+        self.response.write(self.request.GET)
+        self.response.write('\n')
+        self.response.write(self.request.get_all("what"))
+        self.response.write(models.Snippet._properties.keys())
 
 app = webapp2.WSGIApplication([
     ('/', MainHandler)
