@@ -15,11 +15,20 @@
 from credentials import API_KEY
 import webapp2
 import models
+import os
+import jinja2
+
+JINJA_ENVIRONMENT = jinja2.Environment(
+  loader=jinja2.FileSystemLoader(os.path.join(os.path.dirname(__file__), 'templates')),
+  extensions=['jinja2.ext.autoescape'],
+  autoescape=True)
 
 
 class MainHandler(webapp2.RequestHandler):
     def get(self):
-        self.response.write('Hello world!')
+        self.response.headers['Content-Type'] = 'text/html'
+        template = JINJA_ENVIRONMENT.get_template('main.html')
+        self.response.write(template.render())
 
 app = webapp2.WSGIApplication([
     ('/', MainHandler)

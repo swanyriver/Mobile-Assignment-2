@@ -2,6 +2,14 @@
 import webapp2
 import models
 from google.appengine.ext import ndb
+import jinja2
+import os
+
+
+JINJA_ENVIRONMENT = jinja2.Environment(
+  loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
+  extensions=['jinja2.ext.autoescape'],
+  autoescape=True)
 
 # models.Snippet(
 #     title="",
@@ -17,11 +25,11 @@ TESTING_KEY = "TESTING"
 
 class MainHandler(webapp2.RequestHandler):
     def get(self):
-        self.response.headers['Content-Type'] = 'text/html'
+        self.response.headers['Content-Type'] = 'text/plain'
 
         # obliterate testing data
         pKey = ndb.Key(models.Playlist, TESTING_KEY)
-        pKey.delete()
+        for p in  models.Playlist.query(ancestor=pKey).fetch(): p.key.delete()
 
         # regenerate testing data
         playlists = [
@@ -93,8 +101,17 @@ class MainHandler(webapp2.RequestHandler):
 
 
         # query for playlists
+        playlistQuery = models.Playlist.query(ancestor=pKey).order(-models.Playlist.date_added)
+        playlists = playlistQuery.fetch()
+
+
         # update one and put it (mostly to generate .yaml)
+        playlists[0].title += " updated"
+        playlists[0].put()
+
         # display them with jinja template
+        for p in playlists: self.response.write(p.toString() + "\n------------------------------------------------\n")
+
         self.response.write("Testing Data populated")
 app = webapp2.WSGIApplication([
     ('/testData/', MainHandler)
