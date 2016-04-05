@@ -2,7 +2,8 @@ import webapp2
 import jinja2
 import os
 
-class handler(webapp2.RequestHandler):
+
+class Handler(webapp2.RequestHandler):
     JINJA_ENVIRONMENT = jinja2.Environment(
         loader=jinja2.FileSystemLoader(os.path.join(os.path.dirname(__file__), 'templates')),
         extensions=['jinja2.ext.autoescape'],

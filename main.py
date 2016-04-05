@@ -17,7 +17,7 @@ import webapp2
 import handler
 import models
 
-class MainHandler(handler.handler):
+class MainHandler(handler.Handler):
     def get(self):
         #self.render("main.html")
         self.response.headers['Content-Type'] = 'text/plain'

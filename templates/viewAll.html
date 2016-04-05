@@ -10,7 +10,7 @@
     </style>
     {% for p in playlists %}
         <div class="playlist {{ loop.cycle('odd', 'even') }}">
-        <h2>{{ p.title }}</h2>
+        <h2><a href="/testData/playlist/?{{ p.keyForLink() }}">{{ p.title }}</a></h2>
             {% for s in p.snippets %}
                 {{ snippet.snippet(s, false) }}
             {% endfor %}

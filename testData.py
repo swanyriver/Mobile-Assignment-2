@@ -17,7 +17,7 @@ import handler
 TESTING_KEY = "TESTING"
 
 
-class MainHandler(handler.handler):
+class MainHandler(handler.Handler):
     def get(self):
 
         # obliterate testing data
@@ -109,6 +109,11 @@ class MainHandler(handler.handler):
 
         #self.response.write("Testing Data populated")
 
+class viewOne(handler.Handler):
+    def get(self):
+        self.render("viewAll.html", var={'playlists': [models.Playlist.getPlaylistFromRequest(self.request)]})
+
 app = webapp2.WSGIApplication([
+    ('/testData/playlist/', viewOne),
     ('/testData/', MainHandler)
 ], debug=True)

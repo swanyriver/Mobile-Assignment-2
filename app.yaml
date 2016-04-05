@@ -17,7 +17,7 @@ handlers:
 - url: /img
   static_dir: img
 
-- url: /testData/
+- url: /testData/.*
   script: testData.app
   login: admin
 
