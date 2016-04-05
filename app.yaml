@@ -5,13 +5,13 @@ api_version: 1
 threadsafe: yes
 
 handlers:
-- url: /css
+- url: .*/css
   static_dir: css
 
-- url: /fonts
+- url: .*/fonts
   static_dir: fonts
 
-- url: /js
+- url: .*/js
   static_dir: js
 
 - url: /img
