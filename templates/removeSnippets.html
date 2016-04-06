@@ -30,7 +30,11 @@
     $(document).ready(function () {
         $(".removeButton").click(function (e) {
             cb = $(this).children()[0];
-            cb.checked = !cb.checked
+            cb.checked = !cb.checked;
+            panel = $(this).parent().parent();
+            panel.toggleClass('checkedForRemoval');
+            panel.toggleClass('disabled');
+            console.log(panel)
         });
     });
     </script>

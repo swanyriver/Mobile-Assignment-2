@@ -9,6 +9,14 @@
         .snippetPanel {
             width: 900px;
         }
+
+        .panel-heading * {
+            margin-left: 10px;
+        }
+
+        .checkedForRemoval {
+            border: thick dashed indianred;
+        }
     </style>
 {%- endmacro %}
 
@@ -41,8 +49,10 @@
                 <span>{{ snpt.title }}</span>
             </h3>
             <div class="panel-title time-range pull-right">
-                startTime:{{ snpt.startTime }}
-                endTime: {{ snpt.endTime }}
+                End-Time:{{ snpt.endTime }}
+            </div>
+            <div class="panel-title time-range pull-right">
+                Start-Time:{{ snpt.startTime }}
             </div>
             <div class="clearfix"></div>
         </div>
