@@ -28,6 +28,7 @@
             <label>End Time</label>
             <input name="startTime" type="number" class="form-control" placeholder="000">
         </fieldset>
+        {{ playlist.keyForForm() }}
         {{ submitButton() }}
     </form>
 {% endblock body %}
