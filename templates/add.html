@@ -7,28 +7,36 @@
 
 {% block body %}
     <div class="formHeader">
-        Add a snippet to playlist:%20
+        Add a snippet to playlist:
         <span class="playlist-title">{{ playlist.title }}</span>
     </div>
     <form action="/add/" method="post">
         <fieldset class="form-group">
             <label>Snippet Title</label>
-            <input name="title" type="text" class="form-control" placeholder="Enter title">
+            <input name="title" type="text" class="form-control" placeholder="Enter title" required>
         </fieldset>
         {# TODO make a dropdown of previously used video titles if there are already snippets#}
         <fieldset class="form-group">
             <label>Video ID</label>
-            <input name="videoID" type="text" class="form-control" placeholder="Enter title" required>
+            <input name="videoID" type="text" class="form-control" placeholder="Enter Video ID" required>
             {# TODO explanaition of where to find id in urls #}
             <small class="text-muted">TODO explanation of where to find id in URLS</small>
         </fieldset>
         <fieldset class="form-group">
             <label>Start Time</label>
-            <input name="startTime" type="number" class="form-control" placeholder="000">
-            <label>End Time</label>
-            <input name="startTime" type="number" class="form-control" placeholder="000">
+            <input name="startTime" type="number" class="form-control" placeholder="000" required>
+            <small class="text-muted">In Seconds</small>
         </fieldset>
-        {{ playlist.keyForForm() }}
+        <fieldset class="form-group">
+            <label>End Time</label>
+            <input name="endTime" type="number" class="form-control" placeholder="000" required>
+            <small class="text-muted">In Seconds</small>
+        </fieldset>
+        <fieldset class="form-group">
+            <label>Notes</label>
+            <input name="notes" type="text" class="form-control" placeholder="(optional) enter notes about this snippet from the video">
+        </fieldset>
+        {{ playlist.keyForForm()|safe }}
         {{ submitButton() }}
     </form>
 {% endblock body %}

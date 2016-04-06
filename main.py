@@ -40,19 +40,43 @@ class addHandler(Handler):
     def get(self):
         playlist = models.Playlist.getPlaylistFromRequest(self.request)
         if not playlist:
-            return self.redirect('/?')
+            return self.redirect('/?' + Handler.warning("Playlist not found"))
         self.render("add.html", var={"playlist": playlist})
     def post(self):
         playlist = models.Playlist.getPlaylistFromRequest(self.request)
+
         if not playlist:
             return self.redirect("/?" + Handler.warning("Playlist not found"))
-        if any((k not in self.request.POST for k in ("title", "videoID", "startTime", "endTime"))):
+        if any((k not in self.request.POST or not self.request.POST[k] for k in ("title", "videoID", "startTime", "endTime"))):
             return self.redirect('/add/?' + Handler.warning("required fields not found") + '&' + playlist.keyForLink())
 
-        self.response.headers['Content-Type'] = 'text/html'
+        self.response.headers['Content-Type'] = 'text/plain'
+        self.response.write(playlist.toString())
+        self.response.write('\n')
+        self.response.write(self.request.POST)
+        self.response.write('\n')
+
+        #self.response.write(models.Snippet._properties)
+        # for k,v in models.Snippet._properties.items():
+        #     self.response.write("%s : %s %s\n"%(k, str(type(v)), isinstance(v, ndb.IntegerProperty)))
+        # snp = models.Snippet(**self.request.POST)
+        # self.response.write('\n')
+        # self.response.write(snp.toString())
+
+        self.response.write(models.getPopulateDictionary(models.Snippet, self.request.POST.items()))
+
         # validate video
 
-        playlist.snippets.append(models.Snippet(**self.request.POST))
+        # create snippet
+        newSnippet = models.Snippet(**models.getPopulateDictionary(models.Snippet, self.request.POST.items()))
+
+        self.response.write('\n')
+        self.response.write(newSnippet.toString())
+
+        # add it to playlist and put playlist
+
+        # redirect to view with playlist and status
+
 
 
 app = webapp2.WSGIApplication([

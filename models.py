@@ -1,6 +1,10 @@
 from google.appengine.ext import ndb
 
-DATASTORE_KEY="DEV"
+DATASTORE_KEY = "DEV"
+
+
+def getPopulateDictionary(model_class, request):
+    return { k: int(v) if isinstance(getattr(model_class, k), ndb.IntegerProperty) else v for k, v in request if k in model_class._properties }
 
 class Snippet(ndb.Model):
     title = ndb.StringProperty(indexed=False, required=True)
@@ -46,8 +50,11 @@ class Playlist(ndb.Model):
 
     @staticmethod
     def getPlaylistFromRequest(request):
-        pkey = ndb.Key(urlsafe=request.get(Playlist.__name__))
-        return pkey.get()
+        try:
+            pkey = ndb.Key(urlsafe=request.get(Playlist.__name__))
+            return pkey.get()
+        except:
+            return None
 
     @staticmethod
     def createAndStore(kv):
