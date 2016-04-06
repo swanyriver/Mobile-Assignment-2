@@ -13,8 +13,11 @@
 
 
 import webapp2
-from handler import Handler
+from handler import Handler, PlaylistHandler
 import models
+import credentials
+import json
+from google.appengine.api import urlfetch
 
 
 class MainHandler(Handler):
@@ -50,37 +53,68 @@ class addHandler(Handler):
         if any((k not in self.request.POST or not self.request.POST[k] for k in ("title", "videoID", "startTime", "endTime"))):
             return self.redirect('/add/?' + Handler.warning("required fields not found") + '&' + playlist.keyForLink())
 
-        self.response.headers['Content-Type'] = 'text/plain'
-        self.response.write(playlist.toString())
-        self.response.write('\n')
-        self.response.write(self.request.POST)
-        self.response.write('\n')
-
-        #self.response.write(models.Snippet._properties)
-        # for k,v in models.Snippet._properties.items():
-        #     self.response.write("%s : %s %s\n"%(k, str(type(v)), isinstance(v, ndb.IntegerProperty)))
-        # snp = models.Snippet(**self.request.POST)
-        # self.response.write('\n')
-        # self.response.write(snp.toString())
 
         self.response.write(models.getPopulateDictionary(models.Snippet, self.request.POST.items()))
 
-        # validate video
+        # validate videoID
+        # add part=id,snippet to get title from snippet object
+        result = urlfetch.fetch("https://www.googleapis.com/youtube/v3/videos?id=%s&key=%s&part=id"%(
+            self.request.get('videoID'), credentials.API_KEY))
+        if result.status_code != 200:
+            return self.redirect("/add/?%s&%s"%
+                                 (playlist.keyForLink(), Handler.warning("Youtube unreachable to verify videoID")))
+
+        videoJSON = json.loads(result.content)
+        if not videoJSON['pageInfo']['totalResults']:
+            return self.redirect("/add/?%s&%s" %
+                                 (playlist.keyForLink(), Handler.warning("Invalid YouTube VideoID")))
 
         # create snippet
         newSnippet = models.Snippet(**models.getPopulateDictionary(models.Snippet, self.request.POST.items()))
+        # todo validate that start/end times are 0 <= startTime < endTime <= videoLength,  youtube embedd fails gracefully for now
 
-        self.response.write('\n')
-        self.response.write(newSnippet.toString())
 
         # add it to playlist and put playlist
+        playlist.snippets.append(newSnippet)
+        playlist.put()
 
         # redirect to view with playlist and status
+        return self.redirect("/view/?%s&%s"%
+                             (playlist.keyForLink(), Handler.status("Snippet added to playlist")))
 
+
+class viewHandler(PlaylistHandler):
+    def getPlaylist(self, playlist):
+        self.render("view.html", {"playlist": playlist})
+
+
+class delHandler(PlaylistHandler):
+    def getPlaylist(self, playlist):
+        playlist.key.delete()
+        return self.redirect("/?" + Handler.status("Playlist Deleted"))
+
+
+class delSnippetHandler(PlaylistHandler):
+    def getPlaylist(self, playlist):
+        self.render("removeSnippets.html", {'playlist': playlist, 'delete': True})
+
+    def post(self):
+        playlist = models.Playlist.getPlaylistFromRequest(self.request)
+        if not playlist:
+            return self.redirect("/?" + Handler.warning("Playlist not found"))
+
+        delSnippets = [int(v) for v in self.request.get_all('snippetIndex') if 0 <= int(v) < len(playlist.snippets)]
+        playlist.snippets = [s for i, s in enumerate(playlist.snippets) if i not in delSnippets]
+        playlist.put()
+
+        self.redirect("/view/?" + playlist.keyForLink())
 
 
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
     ('/create/', CreateHandler),
-    ('/add/', addHandler)
+    ('/add/', addHandler),
+    ('/view/', viewHandler),
+    ('/delete/', delHandler),
+    ('/delsnippets/', delSnippetHandler)
 ], debug=True)

@@ -2,6 +2,7 @@ import webapp2
 import jinja2
 import os
 import urllib
+import models
 
 class Handler(webapp2.RequestHandler):
     WARNING="warning"
@@ -38,3 +39,13 @@ class Handler(webapp2.RequestHandler):
 
     def getStatus(self):
         return self.getReqVal(Handler.STATUS)
+
+
+class PlaylistHandler(Handler):
+    def get(self):
+        playlist = models.Playlist.getPlaylistFromRequest(self.request)
+
+        if not playlist:
+            return self.redirect("/?" + Handler.warning("Playlist not found"))
+        else:
+            self.getPlaylist(playlist)

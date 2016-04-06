@@ -1,4 +1,5 @@
 from google.appengine.ext import ndb
+import sys
 
 DATASTORE_KEY = "DEV"
 
@@ -52,8 +53,10 @@ class Playlist(ndb.Model):
     def getPlaylistFromRequest(request):
         try:
             pkey = ndb.Key(urlsafe=request.get(Playlist.__name__))
+            print pkey
             return pkey.get()
         except:
+            print sys.exc_info()[0]
             return None
 
     @staticmethod

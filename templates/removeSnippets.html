@@ -1,0 +1,42 @@
+{% extends "view.html" %}
+{% import "playlist.html" as PlaylistTemplate %}
+{% block title %} View Playlist {% endblock %}
+{% block cssSource %}
+    {{ PlaylistTemplate.playlistsStyle() }}
+    <style>
+
+    </style>
+{% endblock %}
+
+{% block bodyOpen %}
+    <form action="/delsnippets/" method="post">
+    {{ playlist.keyForForm()|safe }}
+{% endblock %}
+
+{% macro submit(class) -%}
+<Button type="submit" class="btn btn-danger {{ class }}">
+<span class="glyphicon glyphicon-list"></span>Delete Selected Snippets
+</Button>
+{%- endmacro %}
+
+{% block navRight %}
+    {{ cancelButton("/view/?" + playlist.keyForLink()) }}
+    {{ submit("navbar-btn pull-right") }}
+{% endblock %}
+
+
+{% block jsSource %}
+    <script>
+    $(document).ready(function () {
+        $(".removeButton").click(function (e) {
+            cb = $(this).children()[0];
+            cb.checked = !cb.checked
+        });
+    });
+    </script>
+{% endblock %}
+
+{% block bodyClose %}
+    {{ submit("") }}
+    </form>
+{% endblock %}

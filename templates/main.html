@@ -6,6 +6,7 @@
 <script src="js/{{ src }}"></script>
 {%- endmacro %}
 
+{#    {{ navRightButton(name="", glyph="", link="", theme="") }}#}
 {% macro navRightButton(name, glyph, link, theme="default") -%}
     <a href="{{ link }}" type="button" class="btn btn-{{ theme }} navbar-btn pull-right">
       <span class="glyphicon glyphicon-{{ glyph }}"></span>{{ name }}
@@ -76,6 +77,7 @@
     <![endif]-->
   </head>
   <body>
+    {% block bodyOpen %}{% endblock %}
     {% block navbar %}
         <nav id="navbar" class="navbar navbar-inverse navbar-fixed-top" role="navigation">
           <div class="navbar-inner">
@@ -131,6 +133,7 @@
     {{ js("bootstrap.min.js") }}
 
     {% block jsSource %} {% endblock %}
+    {% block bodyClose %} {% endblock %}
   </body>
 </html>
 {% endautoescape %}

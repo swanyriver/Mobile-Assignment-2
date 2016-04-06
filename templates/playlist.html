@@ -12,6 +12,13 @@
     </style>
 {%- endmacro %}
 
+{% macro deleteCheck(index) -%}
+    <div class="btn btn-danger pull-left removeButton">
+        <input class="removeSnippetCheck" type="checkbox" name="snippetIndex" value="{{ index }}">
+        <span class="glyphicon glyphicon-trash"></span>
+        Remove Snippet from List
+    </div>
+{%- endmacro %}
 
 {% macro youtubeThumbnail(videoId, num) -%}
     <img class="preview_thumbnail" src="http://img.youtube.com/vi/{{ videoId }}/{{ num }}.jpg">
@@ -26,30 +33,30 @@
 {%- endmacro %}
 
 
-{% macro snippet(snpt, editable) -%}
-<div class="panel panel-default snippetPanel">
-  <div class="panel-heading">
-    <h3 class="panel-title snippet-title pull-left">
-        <span>{{ snpt.title }}</span>
-    </h3>
-    <div class="panel-title time-range pull-right">
-        startTime:{{ snpt.startTime }}
-        endTime: {{ snpt.endTime }}
+{% macro snippet(snpt, editable, delete, index) -%}
+    <div class="panel panel-default snippetPanel">
+        <div class="panel-heading">
+            {% if delete %} {{ deleteCheck(index) }} {% endif %}
+            <h3 class="panel-title snippet-title pull-left">
+                <span>{{ snpt.title }}</span>
+            </h3>
+            <div class="panel-title time-range pull-right">
+                startTime:{{ snpt.startTime }}
+                endTime: {{ snpt.endTime }}
+            </div>
+            <div class="clearfix"></div>
+        </div>
+        <div class="panel-body">
+            {{ youtubeEmbed(snpt) }}
+            <div class="snippetNotes">{% if snpt.notes %}{{ snpt.notes }}{% endif %}</div>
+        </div>
     </div>
-    <div class="clearfix"></div>
-  </div>
-  <div class="panel-body">
-      {{ youtubeEmbed(snpt) }}
-      <div class="snippetNotes">{% if snpt.notes %}{{ snpt.notes }}{% endif %}</div>
-  </div>
-</div>
 {%- endmacro %}
 
-{% macro playlist(p) -%}
+{% macro playlist(p, editable=false, delete=false) -%}
     <div class="playlist">
-    <h2>{{ p.title }}</h2>
         {% for s in p.snippets %}
-            {{ snippet(s, false) }}
+            {{ snippet(s, editable, delete, loop.index0) }}
         {% endfor %}
     </div>
 {%- endmacro  %}
@@ -59,20 +66,20 @@
     <div class="playlist_preview">
         <a href="/view/?{{ p.keyForLink() }}">
             <div class="panel panel-default playlist_preview_panel">
-              <div class="panel-heading">
-                <div class="panel-title pull-left">
-                    {{ p.title }}
+                <div class="panel-heading">
+                    <div class="panel-title pull-left">
+                        {{ p.title }}
+                    </div>
+                    <div class="panel-title creator pull-right">
+                        {{ p.creator }}
+                    </div>
+                    <div class="clearfix"></div>
                 </div>
-                <div class="panel-title creator pull-right">
-                    {{ p.creator }}
+                <div class="panel-body">
+                    {% for snpt in p.snippets %}
+                        {{ youtubeThumbnail(snpt.videoID, snpt.selectedThumbnail) }}
+                    {% endfor %}
                 </div>
-                <div class="clearfix"></div>
-              </div>
-              <div class="panel-body">
-                  {% for snpt in p.snippets %}
-                      {{ youtubeThumbnail(snpt.videoID, snpt.selectedThumbnail) }}
-                  {% endfor %}
-              </div>
             </div>
         </a>
     </div>
