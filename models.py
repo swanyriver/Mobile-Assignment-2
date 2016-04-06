@@ -17,7 +17,7 @@ class Snippet(ndb.Model):
 
 class Playlist(ndb.Model):
     title = ndb.StringProperty(indexed=False, required=True)
-    creator = ndb.StringProperty(indexed=False, required=False)
+    creator = ndb.StringProperty(indexed=False, required=True, default="Anonymous")
     snippets = ndb.StructuredProperty(Snippet, repeated=True)
     date_added = ndb.DateTimeProperty(auto_now_add=True)
 
@@ -29,10 +29,14 @@ class Playlist(ndb.Model):
         return st
 
     def keyForForm(self):
-        return "<input type=\"hidden\" name=\"%s\" value=\"%s\"></input>"%(Playlist.__name__,self.key.urlsafe())
+        return "<input type=\"hidden\" name=\"%s\" value=\"%s\"></input>"%(Playlist.__name__, self.key.urlsafe())
+
+    @staticmethod
+    def keyForLinkFromKey(key):
+        return "%s=%s" % (Playlist.__name__, key.urlsafe())
 
     def keyForLink(self):
-        return "%s=%s"%(Playlist.__name__, self.key.urlsafe())
+        return Playlist.keyForLinkFromKey(self.key)
 
     @staticmethod
     def getAll(ancestor=DATASTORE_KEY):
@@ -44,3 +48,10 @@ class Playlist(ndb.Model):
     def getPlaylistFromRequest(request):
         pkey = ndb.Key(urlsafe=request.get(Playlist.__name__))
         return pkey.get()
+
+    @staticmethod
+    def createAndStore(kv):
+        newPlaylist = Playlist(parent=ndb.Key(Playlist, DATASTORE_KEY))
+        newPlaylist.populate(**kv)
+        return newPlaylist.put()
+

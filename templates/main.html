@@ -6,11 +6,26 @@
 <script src="js/{{ src }}"></script>
 {%- endmacro %}
 
-{% macro navRightButton(name, glyph, link) -%}
-    <a href="{{ link }}" type="button" class="btn btn-default navbar-btn pull-right">
+{% macro navRightButton(name, glyph, link, theme="default") -%}
+    <a href="{{ link }}" type="button" class="btn btn-{{ theme }} navbar-btn pull-right">
       <span class="glyphicon glyphicon-{{ glyph }}"></span>{{ name }}
     </a>
 {%- endmacro  %}
+
+{% macro cancelButton(link) -%}
+    {{ navRightButton("cancel", "remove", link, theme="danger") }}
+{%- endmacro  %}
+
+{% macro submitButton() -%}
+    <button type="submit" class="btn btn-success submit-button">Submit</button>
+{%- endmacro %}
+
+{% macro alert(class, text) -%}
+    <div class="alert alert-dismissible alert-{{ class }}" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+     {{ text }}
+    </div>
+{%- endmacro %}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -37,9 +52,21 @@
             float:none;
         }
 
-        .navbar-inner{
+        .navbar-inner {
             text-align:center;
         }
+
+        .page-title {
+            font-size: x-large;
+            color: white;
+            vertical-align: bottom;
+        }
+
+        .navbar-inner * {
+            margin-left: 10px;
+            margin-right: 10px;
+        }
+
     </style>
     {% block cssSource %} {% endblock %}
 
@@ -56,9 +83,11 @@
               <span class="glyphicon glyphicon-home"></span>Home
             </a>
 
-            <span class="nav nav-center">{% block navTitle %}Snippet Playlists{% endblock %}</span>
+            <span class="nav nav-center page-title">{% block navTitle %}Snippet Playlists{% endblock %}</span>
 
-            {% block navRight %}{% endblock %}
+            {% block navRight %}
+                {{ navRightButton("Create Playlist", "plus", "/create/", theme="success") }}
+            {% endblock %}
 
           </div>
         </nav>
@@ -78,6 +107,14 @@
 
         <div id="blocker"></div>
     {% endblock navbar %}
+    {% block status_mesage %}
+        {% if status %}
+            {{ alert("success", status) }}
+        {% endif %}
+        {% if warning %}
+            {{ alert("danger", warning) }}
+        {% endif %}
+    {% endblock status_mesage %}
     {% block body %}
         {%  import "playlist.html" as Playlist %}
         {% if playlists %}

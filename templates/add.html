@@ -1,0 +1,33 @@
+{% extends "main.html" %}
+{% block title %} Add Snippet {% endblock %}
+{% block navTitle %} Add Snippet {% endblock %}
+{% block navRight %}
+    {{ cancelButton("/") }}
+{% endblock %}
+
+{% block body %}
+    <div class="formHeader">
+        Add a snippet to playlist:%20
+        <span class="playlist-title">{{ playlist.title }}</span>
+    </div>
+    <form action="/add/" method="post">
+        <fieldset class="form-group">
+            <label>Snippet Title</label>
+            <input name="title" type="text" class="form-control" placeholder="Enter title">
+        </fieldset>
+        {# TODO make a dropdown of previously used video titles if there are already snippets#}
+        <fieldset class="form-group">
+            <label>Video ID</label>
+            <input name="videoID" type="text" class="form-control" placeholder="Enter title" required>
+            {# TODO explanaition of where to find id in urls #}
+            <small class="text-muted">TODO explanation of where to find id in URLS</small>
+        </fieldset>
+        <fieldset class="form-group">
+            <label>Start Time</label>
+            <input name="startTime" type="number" class="form-control" placeholder="000">
+            <label>End Time</label>
+            <input name="startTime" type="number" class="form-control" placeholder="000">
+        </fieldset>
+        {{ submitButton() }}
+    </form>
+{% endblock body %}

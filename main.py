@@ -13,14 +13,50 @@
 
 
 import webapp2
-import handler
+from handler import Handler
 import models
 
-class MainHandler(handler.Handler):
+
+class MainHandler(Handler):
     def get(self):
         self.render("main.html", var={'playlists': models.Playlist.getAll()})
 
 
+class CreateHandler(Handler):
+    def get(self):
+        self.render("create.html")
+
+    def post(self):
+        # create playlist from post request
+        if 'title' not in self.request.POST:
+            return self.redirect('/')
+        key = models.Playlist.createAndStore({k: v for k, v in self.request.POST.items() if v})
+
+        # redirect to add snippet
+        return self.redirect("/add/?" + models.Playlist.keyForLinkFromKey(key))
+
+
+class addHandler(Handler):
+    def get(self):
+        playlist = models.Playlist.getPlaylistFromRequest(self.request)
+        if not playlist:
+            return self.redirect('/?')
+        self.render("add.html", var={"playlist": playlist})
+    def post(self):
+        playlist = models.Playlist.getPlaylistFromRequest(self.request)
+        if not playlist:
+            return self.redirect("/?" + Handler.warning("Playlist not found"))
+        if any((k not in self.request.POST for k in ("title", "videoID", "startTime", "endTime"))):
+            return self.redirect('/add/?' + Handler.warning("required fields not found") + '&' + playlist.keyForLink())
+
+        self.response.headers['Content-Type'] = 'text/html'
+        # validate video
+
+        playlist.snippets.append(models.Snippet(**self.request.POST))
+
+
 app = webapp2.WSGIApplication([
-    ('/', MainHandler)
+    ('/', MainHandler),
+    ('/create/', CreateHandler),
+    ('/add/', addHandler)
 ], debug=True)
