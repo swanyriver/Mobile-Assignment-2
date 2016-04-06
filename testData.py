@@ -16,7 +16,6 @@ import handler
 
 TESTING_KEY = "TESTING"
 
-
 class MainHandler(handler.Handler):
     def get(self):
 
@@ -94,8 +93,9 @@ class MainHandler(handler.Handler):
 
 
         # query for playlists
-        playlistQuery = models.Playlist.query(ancestor=pKey).order(-models.Playlist.date_added)
-        playlists = playlistQuery.fetch()
+        # playlistQuery = models.Playlist.query(ancestor=pKey).order(-models.Playlist.date_added)
+        # playlists = playlistQuery.fetch()
+        playlists = models.Playlist.getAll(TESTING_KEY)
 
 
         # update one and put it (mostly to generate .yaml)

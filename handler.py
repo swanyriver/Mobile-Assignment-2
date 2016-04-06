@@ -12,5 +12,5 @@ class Handler(webapp2.RequestHandler):
     def render(self, template, var=None):
         self.response.headers['Content-Type'] = 'text/html'
         jTemplate = self.JINJA_ENVIRONMENT.get_template(template)
-        if var :self.response.write(jTemplate.render(var))
+        if var: self.response.write(jTemplate.render(var))
         else: self.response.write(jTemplate.render())

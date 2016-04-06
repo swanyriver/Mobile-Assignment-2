@@ -1,20 +1,10 @@
 {% extends "main.html" %}
-{% import "snippet.html" as snippet %}
+{% import "playlist.html" as playlist %}
 {% block title %} View All {% endblock %}
-{% block cssSource %} {{ snippet.snippetStyle() }} {% endblock %}
+{% block cssSource %} {{ playlist.playlistsStyle() }} {% endblock %}
 {% block body %}
-    <style>
-        .odd {
-            background-color: #a6e1ec;
-        }
-    </style>
     {% for p in playlists %}
-        <div class="playlist {{ loop.cycle('odd', 'even') }}">
-        <h2><a href="/testData/playlist/?{{ p.keyForLink() }}">{{ p.title }}</a></h2>
-            {% for s in p.snippets %}
-                {{ snippet.snippet(s, false) }}
-            {% endfor %}
-        </div>
+        {{ playlist.playlist(p) }}
         <hr>
     {% endfor %}
 {% endblock body %}

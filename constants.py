@@ -1,1 +1,0 @@
-DATA_STORE_KEY = "DEV"

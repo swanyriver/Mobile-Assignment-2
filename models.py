@@ -1,5 +1,6 @@
 from google.appengine.ext import ndb
 
+DATASTORE_KEY="DEV"
 
 class Snippet(ndb.Model):
     title = ndb.StringProperty(indexed=False, required=True)
@@ -7,9 +8,10 @@ class Snippet(ndb.Model):
     videoID = ndb.StringProperty(indexed=False, required=True)
     startTime = ndb.IntegerProperty(indexed=False, required=True)
     endTime = ndb.IntegerProperty(indexed=False, required=True)
-    selectedThumbnail = ndb.IntegerProperty(indexed=False, required=True)
+    videoName = ndb.StringProperty(indexed=False, required=True, default="unnamed")
+    selectedThumbnail = ndb.IntegerProperty(indexed=False, required=True, default=1)
 
-    # Used in debugging, GAE makes use of __str__ so toString is used by m
+    # Used in debugging, GAE makes use of __str__ so toString is used by me
     def toString(self): return str(self.__dict__)
 
 
@@ -19,7 +21,7 @@ class Playlist(ndb.Model):
     snippets = ndb.StructuredProperty(Snippet, repeated=True)
     date_added = ndb.DateTimeProperty(auto_now_add=True)
 
-    # Used in debugging, GAE makes use of __str__ so toString is used by m
+    # Used in debugging, GAE makes use of __str__ so toString is used by me
     def toString(self):
         st = str(self.title)
         st += str(self.creator)
@@ -31,6 +33,12 @@ class Playlist(ndb.Model):
 
     def keyForLink(self):
         return "%s=%s"%(Playlist.__name__, self.key.urlsafe())
+
+    @staticmethod
+    def getAll(ancestor=DATASTORE_KEY):
+        pkey = ndb.Key(Playlist, ancestor)
+        pquery = Playlist.query(ancestor=pkey).order(-Playlist.date_added)
+        return pquery.fetch()
 
     @staticmethod
     def getPlaylistFromRequest(request):

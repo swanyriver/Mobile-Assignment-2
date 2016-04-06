@@ -6,6 +6,12 @@
 <script src="js/{{ src }}"></script>
 {%- endmacro %}
 
+{% macro navRightButton(name, glyph, link) -%}
+    <a href="{{ link }}" type="button" class="btn btn-default navbar-btn pull-right">
+      <span class="glyphicon glyphicon-{{ glyph }}"></span>{{ name }}
+    </a>
+{%- endmacro  %}
+
 <!DOCTYPE html>
 <html lang="en">
 {% autoescape true %}
@@ -14,11 +20,27 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>{% block title %}Snippet Lists{% endblock %}</title>
+    <title>{% block title %}Snippet Playlists{% endblock %}</title>
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 
     <!-- Bootstrap -->
     {{ css("bootstrap.min.css") }}
 
+    <style>
+        .nav.nav-center {
+            display: inline-block;
+            left: 0;
+            right: 0;
+            margin:0;
+            float:none;
+        }
+
+        .navbar-inner{
+            text-align:center;
+        }
+    </style>
     {% block cssSource %} {% endblock %}
 
     <!--[if lt IE 9]>
@@ -27,10 +49,47 @@
     <![endif]-->
   </head>
   <body>
-    {% block body %}hello{% endblock %}
+    {% block navbar %}
+        <nav id="navbar" class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+          <div class="navbar-inner">
+            <a href="/" type="button" class="btn btn-default navbar-btn pull-left">
+              <span class="glyphicon glyphicon-home"></span>Home
+            </a>
 
-    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script> -->
+            <span class="nav nav-center">{% block navTitle %}Snippet Playlists{% endblock %}</span>
+
+            {% block navRight %}{% endblock %}
+
+          </div>
+        </nav>
+
+        <script>
+        $(document).ready(function() {
+            var navbar = document.getElementById('navbar');
+            var blocker = document.getElementById('blocker');
+
+            var height = navbar.clientHeight;
+
+            blocker.setAttribute('style' , 'display:block;height:' + height);
+            blocker.style.height = height + 'px';
+            console.log('resize:' + height);
+        });
+        </script>
+
+        <div id="blocker"></div>
+    {% endblock navbar %}
+    {% block body %}
+        {%  import "playlist.html" as Playlist %}
+        {% if playlists %}
+            {% for p in playlists %}
+                {{ Playlist.playlist_preview(p) }}
+            {% endfor %}
+        {% else %}
+            <div class="empty">There are currently no playlists</div>
+        {% endif %}
+    {% endblock body %}
+
+
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     {{ js("bootstrap.min.js") }}
 
