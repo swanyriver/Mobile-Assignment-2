@@ -41,3 +41,23 @@
     </form>
 {% endblock %}
 
+{% block jsSource %}
+    <script>
+    $(document).ready(function () {
+        $(".up-button").click(function (e) {
+            var snipet_panel = $(this).parent().parent().parent();
+            var pred = snipet_panel.prev('.snippetPanel');
+            if (pred.is('.snippetPanel')){
+                pred.parent().removeChild(snipet_panel);
+                pred.parent().insertBefore(snipet_panel,pred);
+            } else {
+                console.log("already on top")
+            }
+        });
+        $(".down-button").click(function (e) {
+
+        });
+    });
+    </script>
+{% endblock %}
+

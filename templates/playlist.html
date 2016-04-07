@@ -85,6 +85,16 @@
     <div class="panel panel-default snippetPanel">
         <input type="hidden" name="key" value="{{ key }}">
         <div class="panel-heading">
+            <div class="updown pull-left">
+                <label class="btn btn-primary up-button">
+                    <span class="glyphicon glyphicon-triangle-top"></span>
+                    Move Up
+                </label>
+                <label class="btn btn-primary down-button">
+                    <span class="glyphicon glyphicon-triangle-bottom"></span>
+                    Move Down
+                </label>
+            </div>
             <h3 class="panel-title snippet-title pull-left">
                 {{ input(snpt, "title", key=key) }}
             </h3>
