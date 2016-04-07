@@ -17,6 +17,7 @@ from handler import Handler, PlaylistHandler
 import models
 import credentials
 import json
+import sys
 from google.appengine.api import urlfetch
 from google.appengine.ext import ndb
 
@@ -120,31 +121,23 @@ class editHandler(PlaylistHandler):
         playlist = models.Playlist.getPlaylistFromRequest(self.request)
         if not playlist:
             return self.redirect("/?" + Handler.warning("Playlist not found"))
+        try:
+            playlist.snippets = [models.Snippet(**{
+                k: int(self.request.get(key + '_' + k)) if isinstance(getattr(models.Snippet, k),
+                                                                  ndb.IntegerProperty) else self.request.get(key + '_' + k)
+                for k in models.Snippet._properties}) for key in self.request.get_all('key')]
+        except:
+            print sys.exc_info()[0]
+            self.redirect("/view/?" + playlist.keyForLink() + '&' + Handler.warning("There was a problem applying edits"))
 
-        self.response.headers['Content-Type'] = 'text/plain'
-        self.response.write("%s\n" % self.request.POST)
-        self.response.write("%s\n" % self.request.get_all('key'))
-        for key in self.request.get_all('key'):
-            d = {k: int(self.request.get(key + '_' + k)) if isinstance(
-                                                             getattr(models.Snippet, k),
-                                                             ndb.IntegerProperty) else
-                self.request.get(key+'_'+k) for k in models.Snippet._properties}
-            self.response.write("snippet %s: %s\n" % (key, d))
-            # self.response.write("snippet %s: %s" % (key,
-            #                                         {k: int(self.request.get(key + '_' + k)) if isinstance(
-            #                                             getattr(models.Snippet, k),
-            #                                             ndb.IntegerProperty) else self.request.get(key + '_' + k) for k
-            #                                          in models.Snippet._properties}))
+        req_fields = models.Snippet._properties.keys()
+        req_fields.remove('notes')
 
-        self.response.write("\n--------------before--------------------------------\n%s\n--------------------------------\n\n"%playlist)
-        playlist.snippets = [models.Snippet(**{
-            k: int(self.request.get(key + '_' + k)) if isinstance(getattr(models.Snippet, k),
-                                                              ndb.IntegerProperty) else self.request.get(key + '_' + k)
-            for k in models.Snippet._properties}) for key in self.request.get_all('key')]
-        #playlist.put()
-        #return self.redirect("/view/?" + playlist.keyForLink())
+        if any(not v for v in [getattr(snpt, n) for snpt in playlist.snippets for n in req_fields]):
+            return self.redirect("/view/?" + playlist.keyForLink() + '&' + Handler.warning("Required fields were missing"))
 
-        self.response.write("\n--------------after--------------------------------\n%s\n--------------------------------\n\n"%playlist)
+        playlist.put()
+        return self.redirect("/view/?" + playlist.keyForLink() + '&' + Handler.status("Edits applied to playlist"))
 
 app = webapp2.WSGIApplication([
     ('/', MainHandler),

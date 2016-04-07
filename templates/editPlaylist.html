@@ -21,7 +21,7 @@
 
 {% block navRight %}
     {{ cancelButton("/view/?" + playlist.keyForLink()) }}
-    {{ submit("navbar-btn pull-right") }}
+    {% if playlist.snippets %}{{ submit("navbar-btn pull-right") }}{% endif %}
 {% endblock %}
 
 {% block body %}
@@ -37,7 +37,7 @@
 
 
 {% block bodyClose %}
-    {{ submit("") }}
+    {% if playlist.snippets %}{{ submit("") }} {% endif %}
     </form>
 {% endblock %}
 
