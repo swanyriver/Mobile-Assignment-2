@@ -1,0 +1,43 @@
+{% extends "view.html" %}
+{% import "playlist.html" as PlaylistTemplate %}
+{% block title %} Edit Playlist {% endblock %}
+{% block cssSource %}
+    {{ PlaylistTemplate.playlistsStyle() }}
+    <style>
+
+    </style>
+{% endblock %}
+
+{% block bodyOpen %}
+    <form action="/edit/" method="post">
+    {{ playlist.keyForForm()|safe }}
+{% endblock %}
+
+{% macro submit(class) -%}
+<Button type="submit" class="btn btn-primary {{ class }}">
+<span class="glyphicon glyphicon-floppy-save"></span>Save Edits
+</Button>
+{%- endmacro %}
+
+{% block navRight %}
+    {{ cancelButton("/view/?" + playlist.keyForLink()) }}
+    {{ submit("navbar-btn pull-right") }}
+{% endblock %}
+
+{% block body %}
+    {% if playlist.snippets %}
+        {{ PlaylistTemplate.editPlaylist(playlist) }}
+    {% else %}
+        There are currently no snippets in this playlist
+        <a href="/add/?{{ playlist.keyForLink() }}" type="button" class="btn btn-success">
+            <span class="glyphicon glyphicon-plus"></span> Add Snippet
+        </a>
+    {% endif %}
+{% endblock %}
+
+
+{% block bodyClose %}
+    {{ submit("") }}
+    </form>
+{% endblock %}
+

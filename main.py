@@ -109,6 +109,14 @@ class delSnippetHandler(PlaylistHandler):
 
         self.redirect("/view/?" + playlist.keyForLink())
 
+class editHandler(PlaylistHandler):
+    def getPlaylist(self, playlist):
+        self.render("editPlaylist.html", {'playlist': playlist})
+
+    def post(self):
+        self.response.headers['Content-Type'] = 'text/plain'
+        self.response.write(self.request.POST)
+
 
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
@@ -116,5 +124,6 @@ app = webapp2.WSGIApplication([
     ('/add/', addHandler),
     ('/view/', viewHandler),
     ('/delete/', delHandler),
-    ('/delsnippets/', delSnippetHandler)
+    ('/delsnippets/', delSnippetHandler),
+    ('/edit/', editHandler)
 ], debug=True)
