@@ -1,17 +1,31 @@
 {% macro playlistsStyle() -%}
     <style>
         .snippetEmbed {
-            float: left;
             height: 300px;
             width: 400px;
         }
 
         .snippetPanel {
-            width: 900px;
+            width: 1250px;
         }
 
         .panel-heading * {
             margin-left: 10px;
+        }
+
+        .snippetNotes {
+            padding-left: 10px;
+            padding-right: 10px;
+        }
+
+        .notes-input {
+            width: 100%;
+            height: 300px;
+        }
+
+        .snippetPanel .panel-footer > div {
+            display: inline;
+            margin-right: 10px;
         }
 
         .checkedForRemoval {
@@ -56,9 +70,9 @@
             </div>
             <div class="clearfix"></div>
         </div>
-        <div class="panel-body">
-            {{ youtubeEmbed(snpt) }}
-            <div class="snippetNotes">{% if snpt.notes %}{{ snpt.notes }}{% endif %}</div>
+        <div class="panel-body row">
+            <div class="col-md-4"> {{ youtubeEmbed(snpt) }} </div>
+            <div class="snippetNotes col-md-8">{% if snpt.notes %}{{ snpt.notes }}{% endif %}</div>
         </div>
     </div>
 {%- endmacro %}
@@ -82,19 +96,23 @@
             </div>
             <div class="clearfix"></div>
         </div>
-        <div class="panel-body">
-            {{ youtubeEmbed(snpt) }}
+        <div class="panel-body row">
+            <div class="col-md-4"> {{ youtubeEmbed(snpt) }} </div>
             {{ input(snpt, "videoID", type="hidden", key=key)}}
-            <div class="snippetNotes"><input class="notes-input" type="text" name="{{ key }}_notes" value="{{ snpt.notes or '' }}"> </div>
+            <div class="snippetNotes col-md-8">
+                <textarea class="notes-input" name="{{ key }}_notes">{{ snpt.notes or '' }}</textarea>
+            </div>
         </div>
         <div class="panel-footer">
-            <label>Preview Thumbnail</label>
+            <label>Preview Thumbnail</label><br>
+            <small class="text-muted">Used on homepage playlist previews only</small><br>
             {% for i in range(1,4) %}
                 <div class="thumbnail-option">
                     <input type="radio" name="{{ key }}_selectedThumbnail" value="{{ i }}" {% if snpt.selectedThumbnail == i%}checked{% endif %}>
                     {{ youtubeThumbnail(snpt.videoID, i) }}
                 </div>
             {% endfor %}
+            <div class="clearfix"></div>
         </div>
     </div>
 {%- endmacro %}
