@@ -64,7 +64,7 @@
 {%- endmacro %}
 
 {% macro input(obj, name, type="text", key=None, required=true) -%}
-    <input type="{{ type }}" name="{% if key %}{{ key }}_{% endif %}{{ name }}" value="{{ obj[name] }}"{% if required %} required {% endif %}>
+    <input type="{{ type }}" name="{% if key != None %}{{ key }}_{% endif %}{{ name }}" value="{{ obj[name] }}"{% if required %} required {% endif %}>
 {%- endmacro %}
 
 {% macro editSnippet(snpt, key) -%}
@@ -72,40 +72,29 @@
         <input type="hidden" name="key" value="{{ key }}">
         <div class="panel-heading">
             <h3 class="panel-title snippet-title pull-left">
-                {{ input(snpt, "title") }}
+                {{ input(snpt, "title", key=key) }}
             </h3>
             <div class="panel-title time-range pull-right">
-                End-Time: {{ input(snpt, "endTime", type="number") }}
+                End-Time: {{ input(snpt, "endTime", type="number", key=key) }}
             </div>
             <div class="panel-title time-range pull-right">
-                Start-Time:{{ input(snpt, "startTime", type="number") }}
+                Start-Time:{{ input(snpt, "startTime", type="number", key=key) }}
             </div>
             <div class="clearfix"></div>
         </div>
         <div class="panel-body">
             {{ youtubeEmbed(snpt) }}
-            {{ input(snpt, "videoID", type="hidden")}}
-            <div class="snippetNotes"><input class="notes-input" type="text" name="notes" value="{{ snpt.notes }}"> </div>
+            {{ input(snpt, "videoID", type="hidden", key=key)}}
+            <div class="snippetNotes"><input class="notes-input" type="text" name="{{ key }}_notes" value="{{ snpt.notes or '' }}"> </div>
         </div>
         <div class="panel-footer">
-{#            <fieldset class="thumbnailGroup">
-                <label>Preview Thumbnail</label>
-                {% for i in range(1,4) %}
-                    <div class="thumbnail-option">
-                        <input type="radio" name="selectedThumbnail" value="{{ i }}" {% if snpt.selectedThumbnail == i%}checked{% endif %}>
-                        {{ youtubeThumbnail(snpt.videoID, i) }}
-                    </div>
-                {% endfor %}
-            </fieldset>#}
-            <radiogroup class="thumbnailGroup">
-                <label>Preview Thumbnail</label>
-                {% for i in range(1,4) %}
-                    <div class="thumbnail-option">
-                        <input type="radio" name="{{ key }}_selectedThumbnail" value="{{ i }}" {% if snpt.selectedThumbnail == i%}checked{% endif %}>
-                        {{ youtubeThumbnail(snpt.videoID, i) }}
-                    </div>
-                {% endfor %}
-            </radiogroup>
+            <label>Preview Thumbnail</label>
+            {% for i in range(1,4) %}
+                <div class="thumbnail-option">
+                    <input type="radio" name="{{ key }}_selectedThumbnail" value="{{ i }}" {% if snpt.selectedThumbnail == i%}checked{% endif %}>
+                    {{ youtubeThumbnail(snpt.videoID, i) }}
+                </div>
+            {% endfor %}
         </div>
     </div>
 {%- endmacro %}
