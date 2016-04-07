@@ -5,7 +5,7 @@ DATASTORE_KEY = "DEV"
 
 
 def getPopulateDictionary(model_class, request):
-    return { k: int(v) if isinstance(getattr(model_class, k), ndb.IntegerProperty) else v for k, v in request if k in model_class._properties }
+    return {k: int(v) if isinstance(getattr(model_class, k), ndb.IntegerProperty) else v for k, v in request if k in model_class._properties }
 
 class Snippet(ndb.Model):
     title = ndb.StringProperty(indexed=False, required=True)
@@ -13,7 +13,6 @@ class Snippet(ndb.Model):
     videoID = ndb.StringProperty(indexed=False, required=True)
     startTime = ndb.IntegerProperty(indexed=False, required=True)
     endTime = ndb.IntegerProperty(indexed=False, required=True)
-    videoName = ndb.StringProperty(indexed=False, required=True, default="unnamed")
     selectedThumbnail = ndb.IntegerProperty(indexed=False, required=True, default=1)
 
     # Used in debugging, GAE makes use of __str__ so toString is used by me

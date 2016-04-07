@@ -63,13 +63,13 @@
     </div>
 {%- endmacro %}
 
-{% macro input(obj, name, type="text", required=true) -%}
-    <input type="{{ type }}" name="{{ name }}" value="{{ obj[name] }}"{% if required %} required {% endif %}>
+{% macro input(obj, name, type="text", key=None, required=true) -%}
+    <input type="{{ type }}" name="{% if key %}{{ key }}_{% endif %}{{ name }}" value="{{ obj[name] }}"{% if required %} required {% endif %}>
 {%- endmacro %}
 
 {% macro editSnippet(snpt, key) -%}
     <div class="panel panel-default snippetPanel">
-        <input type="hidden" value="{{ key }}">
+        <input type="hidden" name="key" value="{{ key }}">
         <div class="panel-heading">
             <h3 class="panel-title snippet-title pull-left">
                 {{ input(snpt, "title") }}
@@ -84,6 +84,7 @@
         </div>
         <div class="panel-body">
             {{ youtubeEmbed(snpt) }}
+            {{ input(snpt, "videoID", type="hidden")}}
             <div class="snippetNotes"><input class="notes-input" type="text" name="notes" value="{{ snpt.notes }}"> </div>
         </div>
         <div class="panel-footer">
@@ -100,7 +101,7 @@
                 <label>Preview Thumbnail</label>
                 {% for i in range(1,4) %}
                     <div class="thumbnail-option">
-                        <input type="radio" name="selectedThumbnail_{{ key }}" value="{{ i }}" {% if snpt.selectedThumbnail == i%}checked{% endif %}>
+                        <input type="radio" name="{{ key }}_selectedThumbnail" value="{{ i }}" {% if snpt.selectedThumbnail == i%}checked{% endif %}>
                         {{ youtubeThumbnail(snpt.videoID, i) }}
                     </div>
                 {% endfor %}

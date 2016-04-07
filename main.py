@@ -115,7 +115,10 @@ class editHandler(PlaylistHandler):
 
     def post(self):
         self.response.headers['Content-Type'] = 'text/plain'
-        self.response.write(self.request.POST)
+        self.response.write("%s\n"%self.request.POST)
+        self.response.write("%s\n"%self.request.get_all('key'))
+        #for key in self.request.get_all('key'):
+
 
 
 app = webapp2.WSGIApplication([
