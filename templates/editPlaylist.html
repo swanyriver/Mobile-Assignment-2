@@ -46,16 +46,25 @@
     $(document).ready(function () {
         $(".up-button").click(function (e) {
             var snipet_panel = $(this).parent().parent().parent();
-            var pred = snipet_panel.prev('.snippetPanel');
-            if (pred.is('.snippetPanel')){
-                pred.parent().removeChild(snipet_panel);
-                pred.parent().insertBefore(snipet_panel,pred);
+            var pred = snipet_panel.prev('.snippetPanel')[0];
+            snipet_panel = snipet_panel[0];
+            if (pred.classList.contains('snippetPanel')){
+                pred.parentElement.removeChild(snipet_panel);
+                pred.parentElement.insertBefore(snipet_panel,pred);
             } else {
                 console.log("already on top")
             }
         });
         $(".down-button").click(function (e) {
-
+            var snipet_panel = $(this).parent().parent().parent();
+            var next = snipet_panel.next('.snippetPanel')[0];
+            snipet_panel = snipet_panel[0];
+            if (next && next.classList.contains('snippetPanel')){
+                snipet_panel.parentElement.removeChild(next);
+                snipet_panel.parentElement.insertBefore(next,snipet_panel);
+            } else {
+                console.log("already on bottom")
+            }
         });
     });
     </script>

@@ -82,7 +82,7 @@
 {%- endmacro %}
 
 {% macro editSnippet(snpt, key) -%}
-    <div class="panel panel-default snippetPanel">
+    <div class="panel panel-default snippetPanel" id="snippetPanel-{{ key }}">
         <input type="hidden" name="key" value="{{ key }}">
         <div class="panel-heading">
             <div class="updown pull-left">
