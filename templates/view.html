@@ -5,11 +5,11 @@
 {% block navTitle %} {{ playlist.title }} by {{ playlist.creator }} {% endblock %}
 {% block navRight %}
     {{ navRightButton(name="Delete Playlist", glyph="trash", link="/delete/?" + playlist.keyForLink(), theme="danger") }}
-    {{ navRightButton(name="Remove Snippets", glyph="list", link="/delsnippets/?" + playlist.keyForLink(), theme="danger") }}
-    {{ navRightButton(name="Edit", glyph="pencil", link="/edit/?" + playlist.keyForLink(), theme="warning") }}
+    {% if playlist.snippets %}
+        {{ navRightButton(name="Remove Snippets", glyph="list", link="/delsnippets/?" + playlist.keyForLink(), theme="danger") }}
+        {{ navRightButton(name="Edit", glyph="pencil", link="/edit/?" + playlist.keyForLink(), theme="warning") }}
+    {% endif %}
     {{ navRightButton(name="Add Snippet", glyph="plus", link="/add/?" + playlist.keyForLink(), theme="success") }}
-
-
 {% endblock %}
 
 {% block body %}

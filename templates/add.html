@@ -1,15 +1,11 @@
 {% extends "main.html" %}
 {% block title %} Add Snippet {% endblock %}
-{% block navTitle %} Add Snippet {% endblock %}
+{% block navTitle %} Add Snippet to {{ playlist.title }} by {{ playlist.creator }} {% endblock %}
 {% block navRight %}
     {{ cancelButton("/view/?" + playlist.keyForLink()) }}
 {% endblock %}
 
 {% block body %}
-    <div class="formHeader">
-        Add a snippet to playlist:
-        <span class="playlist-title">{{ playlist.title }}</span>
-    </div>
     <form action="/add/" method="post">
         <fieldset class="form-group">
             <label>Snippet Title</label>
@@ -24,12 +20,12 @@
         </fieldset>
         <fieldset class="form-group">
             <label>Start Time</label>
-            <input name="startTime" type="number" class="form-control" placeholder="000" required>
+            <input name="startTime" type="number" class="form-control" placeholder="###" required>
             <small class="text-muted">In Seconds</small>
         </fieldset>
         <fieldset class="form-group">
             <label>End Time</label>
-            <input name="endTime" type="number" class="form-control" placeholder="000" required>
+            <input name="endTime" type="number" class="form-control" placeholder="###" required>
             <small class="text-muted">In Seconds</small>
         </fieldset>
         <fieldset class="form-group">

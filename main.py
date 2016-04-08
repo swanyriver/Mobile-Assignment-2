@@ -69,6 +69,7 @@ class addHandler(Handler):
 
         videoJSON = json.loads(result.content)
         if not videoJSON['pageInfo']['totalResults']:
+            # todo repopulate fields
             return self.redirect("/add/?%s&%s" %
                                  (playlist.keyForLink(), Handler.warning("Invalid YouTube VideoID")))
 
@@ -99,7 +100,11 @@ class delHandler(PlaylistHandler):
 
 class delSnippetHandler(PlaylistHandler):
     def getPlaylist(self, playlist):
-        self.render("removeSnippets.html", {'playlist': playlist, 'delete': True})
+        if playlist.snippets:
+            self.render("removeSnippets.html", {'playlist': playlist, 'delete': True})
+        else:
+            return self.redirect("/view/?" + playlist.keyForLink() + '&' +
+                                 Handler.warning("This playlist has no snippets to remove"))
 
     def post(self):
         playlist = models.Playlist.getPlaylistFromRequest(self.request)
@@ -115,7 +120,11 @@ class delSnippetHandler(PlaylistHandler):
 
 class editHandler(PlaylistHandler):
     def getPlaylist(self, playlist):
-        self.render("editPlaylist.html", {'playlist': playlist})
+        if playlist.snippets:
+            self.render("editPlaylist.html", {'playlist': playlist})
+        else:
+            return self.redirect("/view/?" + playlist.keyForLink() + '&' +
+                                 Handler.warning("This playlist has no snippets to edit"))
 
     def post(self):
         playlist = models.Playlist.getPlaylistFromRequest(self.request)
