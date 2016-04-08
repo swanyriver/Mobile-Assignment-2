@@ -1,6 +1,6 @@
 {% extends "view.html" %}
 {% import "playlist.html" as PlaylistTemplate %}
-{% block title %} View Playlist {% endblock %}
+{% block title %} Remove snippets from Playlist {% endblock %}
 {% block cssSource %}
     {{ PlaylistTemplate.playlistsStyle() }}
     <style>
@@ -21,7 +21,7 @@
 
 {% block navRight %}
     {{ cancelButton("/view/?" + playlist.keyForLink()) }}
-    {{ submit("navbar-btn pull-right") }}
+    {% if playlist.snippets %}{{ submit("navbar-btn pull-right") }}{% endif %}
 {% endblock %}
 
 
@@ -41,6 +41,6 @@
 {% endblock %}
 
 {% block bodyClose %}
-    {{ submit("") }}
+    {% if playlist.snippets %}{{ submit("") }}{% endif %}
     </form>
 {% endblock %}
