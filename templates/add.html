@@ -15,8 +15,14 @@
         <fieldset class="form-group">
             <label>Video ID</label>
             <input name="videoID" type="text" class="form-control" placeholder="Enter Video ID" required>
-            {# TODO explanaition of where to find id in urls #}
-            <small class="text-muted">TODO explanation of where to find id in URLS</small>
+            <style>
+                .id-highlight {color:#b92c28}
+            </style>
+            <small class="text-muted">YouTube video IDs can be found in YouTube URLs like so:
+                <br> https://www.youtube.com/watch?v=<span class="id-highlight">dQw4w9WgXcQ</span>
+                <br> https://youtu.be/<span class="id-highlight">dQw4w9WgXcQ</span>
+                <br> https://www.youtube.com/v/<span class="id-highlight">dQw4w9WgXcQ</span>
+            </small>
         </fieldset>
         <fieldset class="form-group">
             <label>Start Time</label>
