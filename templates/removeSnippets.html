@@ -29,9 +29,9 @@
     <script>
     $(document).ready(function () {
         $(".removeButton").click(function (e) {
-            cb = $(this).children()[0];
+            var cb = $(this).children()[0];
             cb.checked = !cb.checked;
-            panel = $(this).parent().parent();
+            var panel = $(this).parent().parent();
             panel.toggleClass('checkedForRemoval');
             panel.toggleClass('disabled');
             console.log(panel)
