@@ -18,6 +18,8 @@ class Snippet(ndb.Model):
 
 
 class Playlist(ndb.Model):
+    AnonymousParent = ndb.Key(__name__, "Anonymous")
+
     title = ndb.StringProperty(indexed=False, required=True)
     creator = ndb.StringProperty(indexed=False, required=True, default="Anonymous")
     snippets = ndb.KeyProperty(kind=Snippet, repeated=True, indexed=False)

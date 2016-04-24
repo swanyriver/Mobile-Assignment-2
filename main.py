@@ -186,6 +186,6 @@ class editHandler(PlaylistHandler):
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
     ('/playlist/', PlaylistMain),
-    ('/playlist.json', allplaylistsJson),
+    webapp2.Route('/playlist.json', allplaylistsJson),
     webapp2.Route('/playlist/<Playlist>/', handler=PlaylistRoute)
 ], debug=True)
