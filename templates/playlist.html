@@ -113,17 +113,17 @@
                 <textarea class="notes-input" name="{{ key }}_notes">{{ snpt.notes or '' }}</textarea>
             </div>
         </div>
-        <div class="panel-footer">
-            <label>Preview Thumbnail</label><br>
-            <small class="text-muted">Used on homepage playlist previews only</small><br>
-            {% for i in range(1,4) %}
-                <div class="thumbnail-option">
-                    <input type="radio" name="{{ key }}_selectedThumbnail" value="{{ i }}" {% if snpt.selectedThumbnail == i%}checked{% endif %}>
-                    {{ youtubeThumbnail(snpt.videoID, i) }}
-                </div>
-            {% endfor %}
-            <div class="clearfix"></div>
-        </div>
+{#        <div class="panel-footer">#}
+{#            <label>Preview Thumbnail</label><br>#}
+{#            <small class="text-muted">Used on homepage playlist previews only</small><br>#}
+{#            {% for i in range(1,4) %}#}
+{#                <div class="thumbnail-option">#}
+{#                    <input type="radio" name="{{ key }}_selectedThumbnail" value="{{ i }}" {% if snpt.selectedThumbnail == i%}checked{% endif %}>#}
+{#                    {{ youtubeThumbnail(snpt.videoID, i) }}#}
+{#                </div>#}
+{#            {% endfor %}#}
+{#            <div class="clearfix"></div>#}
+{#        </div>#}
     </div>
 {%- endmacro %}
 
@@ -158,7 +158,8 @@
                 </div>
                 <div class="panel-body">
                     {% for snpt in p.snippets %}
-                        {{ youtubeThumbnail(snpt.videoID, snpt.selectedThumbnail) }}
+{#                        {{ youtubeThumbnail(snpt.videoID, snpt.selectedThumbnail) }}#}
+                        {{ youtubeThumbnail(snpt.videoID, 1) }}
                     {% endfor %}
                 </div>
             </div>

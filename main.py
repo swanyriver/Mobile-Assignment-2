@@ -27,19 +27,49 @@ class MainHandler(Handler):
         self.render("main.html", var={'playlists': models.Playlist.getAll()})
 
 
-class CreateHandler(Handler):
+# return json of all playlists
+class allplaylistsJson(Handler):
     def get(self):
-        self.render("create.html")
+        #todo create json of all playlists from models.Playlist.getAll()
+        self.returnJSON('this is where the json will be')
 
+
+# create playlist or return all playlists html
+class PlaylistMain(Handler):
+    def get(self):
+        if self.getReqVal(Handler.ACTION) == "create":
+            self.render("create.html")
+        else:
+            self.render("main.html", var={'playlists': models.Playlist.getAll()})
+
+    #create playlists
     def post(self):
         # create playlist from post request
         if 'title' not in self.request.POST:
             return self.redirect('/')
         key = models.Playlist.createAndStore({k: v for k, v in self.request.POST.items() if v})
 
+        #todo put in form key for from UI
+        #if not reuturn json of url
+        #else redirect to newly created url
+
         # redirect to add snippet
         return self.redirect("/add/?" + models.Playlist.keyForLinkFromKey(key))
 
+
+    def put(self):
+        # todo move delete from list and reorder list to here
+        pass
+
+
+class PlaylistRoute(webapp2.RequestHandler):
+    def get(self, *args, **kwargs):
+        self.response.write(kwargs)
+
+#todo subsume other handlers as verbs
+# class Playlist(PlaylistHandler):
+#     def getPlaylist(self, playlist):
+#         self.render("view.html", {"playlist": playlist})
 
 class addHandler(Handler):
     def get(self):
@@ -86,10 +116,6 @@ class addHandler(Handler):
         return self.redirect("/view/?%s&%s" %
                              (playlist.keyForLink(), Handler.status("Snippet added to playlist")))
 
-
-class viewHandler(PlaylistHandler):
-    def getPlaylist(self, playlist):
-        self.render("view.html", {"playlist": playlist})
 
 
 class delHandler(PlaylistHandler):
@@ -148,12 +174,18 @@ class editHandler(PlaylistHandler):
         playlist.put()
         return self.redirect("/view/?" + playlist.keyForLink() + '&' + Handler.status("Edits applied to playlist"))
 
+# app = webapp2.WSGIApplication([
+#     ('/', MainHandler),
+#     ('/create/', CreateHandler),
+#     ('/add/', addHandler),
+#     ('/view/', viewHandler),
+#     ('/delete/', delHandler),
+#     ('/delsnippets/', delSnippetHandler),
+#     ('/edit/', editHandler)
+# ], debug=True)
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
-    ('/create/', CreateHandler),
-    ('/add/', addHandler),
-    ('/view/', viewHandler),
-    ('/delete/', delHandler),
-    ('/delsnippets/', delSnippetHandler),
-    ('/edit/', editHandler)
+    ('/playlist/', PlaylistMain),
+    ('/playlist.json', allplaylistsJson),
+    webapp2.Route('/playlist/<Playlist>/', handler=PlaylistRoute)
 ], debug=True)

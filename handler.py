@@ -4,9 +4,11 @@ import os
 import urllib
 import models
 
+
 class Handler(webapp2.RequestHandler):
     WARNING="warning"
     STATUS="status"
+    ACTION="action"
     JINJA_ENVIRONMENT = jinja2.Environment(
         loader=jinja2.FileSystemLoader(os.path.join(os.path.dirname(__file__), 'templates')),
         extensions=['jinja2.ext.autoescape'],
@@ -40,10 +42,18 @@ class Handler(webapp2.RequestHandler):
     def getStatus(self):
         return self.getReqVal(Handler.STATUS)
 
+    def reqJSON(self):
+        return 'application/json' in self.request.accept
+
+    def returnJSON(self, jsonSt, code=200, message=None):
+        self.response.set_status(code, message)
+        self.response.headers['Content-Type'] = 'application/json'
+        self.response.out.write(jsonSt)
+
 
 class PlaylistHandler(Handler):
-    def get(self):
-        playlist = models.Playlist.getPlaylistFromRequest(self.request)
+    def get(self, **kwargs):
+        playlist = models.Playlist.getPlaylistFromRequest(kwargs)
 
         if not playlist:
             return self.redirect("/?" + Handler.warning("Playlist not found"))
