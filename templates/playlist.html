@@ -157,7 +157,9 @@
                     <div class="clearfix"></div>
                 </div>
                 <div class="panel-body">
+                    <!-- p.snippets  = {{ p.snippets }}-->
                     {% for snpt in p.snippets %}
+                        <!-- {{ snpt }} -->
 {#                        {{ youtubeThumbnail(snpt.videoID, snpt.selectedThumbnail) }}#}
                         {{ youtubeThumbnail(snpt.videoID, 1) }}
                     {% endfor %}

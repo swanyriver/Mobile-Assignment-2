@@ -41,6 +41,13 @@ class Playlist(ndb.Model):
     def keyForLinkFromKey(key):
         return "/playlist/%s/" % (key.urlsafe())
 
+    @staticmethod
+    def jsonLinkfromKey(key):
+        return "/playlist/%s.json" % (key.urlsafe())
+
+    def jsonLink(self):
+        return Playlist.jsonLinkfromKey(self.key)
+
     def keyForLink(self):
         return Playlist.keyForLinkFromKey(self.key)
 
@@ -50,12 +57,12 @@ class Playlist(ndb.Model):
             pkey = ndb.Key(Playlist, ancestor)
             pquery = Playlist.query(ancestor=pkey).order(-Playlist.date_added)
             return pquery.fetch()
-        #todo test this, homepage, get all
         else:
-            return Playlist.query()
+            plists = Playlist.query()
+            for p in plists: p.snippets = ndb.get_multi(p.snippetKeys)
+            return plists
 
 
-    #todo get from url
     @classmethod
     def getPlaylistFromURL(cls, kwargs):
         if cls.__name__ not in kwargs: return None
@@ -77,7 +84,7 @@ class Playlist(ndb.Model):
 
     @staticmethod
     def createAndStore(kv):
-        newPlaylist = Playlist(parent=ndb.Key(Playlist, kv['creator']))
+        newPlaylist = Playlist(parent=ndb.Key(Playlist, kv.get['creator']) if 'creator' in kv else Playlist.AnonymousParent)
         newPlaylist.populate(**kv)
         return newPlaylist.put()
 

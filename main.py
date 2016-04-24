@@ -46,15 +46,20 @@ class PlaylistMain(Handler):
     def post(self):
         # create playlist from post request
         if 'title' not in self.request.POST:
-            return self.redirect('/')
+            if self.fromUI():
+                return self.redirect('/')
+            else:
+                self.returnJSON(None, code=400)
         key = models.Playlist.createAndStore({k: v for k, v in self.request.POST.items() if v})
 
-        #todo put in form key for from UI
-        #if not reuturn json of url
-        #else redirect to newly created url
+        if self.fromUI():
+            # redirect to add snippet
+            return self.redirect(models.Playlist.keyForLinkFromKey(key))
 
-        # redirect to add snippet
-        return self.redirect("/add/?" + models.Playlist.keyForLinkFromKey(key))
+        else:
+            self.returnJSON(json.dumps({'url':models.Playlist.keyForLinkFromKey(key),
+                                        'json':models.Playlist.jsonLinkfromKey(key)}), code=201)
+
 
 
     def put(self):
@@ -62,14 +67,17 @@ class PlaylistMain(Handler):
         pass
 
 
-class PlaylistRoute(webapp2.RequestHandler):
-    def get(self, *args, **kwargs):
-        self.response.write(kwargs)
+class PlaylistRoute(PlaylistHandler):
+    def getPlaylist(self, playlist):
+        self.render("view.html", {"playlist": playlist})
+
+    #add a snippet or edit them
+    def postPlaylist(self, ):
+        pass
+
 
 #todo subsume other handlers as verbs
-# class Playlist(PlaylistHandler):
-#     def getPlaylist(self, playlist):
-#         self.render("view.html", {"playlist": playlist})
+
 
 class addHandler(Handler):
     def get(self):
@@ -174,6 +182,10 @@ class editHandler(PlaylistHandler):
         playlist.put()
         return self.redirect("/view/?" + playlist.keyForLink() + '&' + Handler.status("Edits applied to playlist"))
 
+class testRoute(Handler):
+    def get(self, **kwargs):
+        self.response.write("%r"%kwargs)
+
 # app = webapp2.WSGIApplication([
 #     ('/', MainHandler),
 #     ('/create/', CreateHandler),
@@ -187,5 +199,6 @@ app = webapp2.WSGIApplication([
     ('/', MainHandler),
     ('/playlist/', PlaylistMain),
     webapp2.Route('/playlist.json', allplaylistsJson),
-    webapp2.Route('/playlist/<Playlist>/', handler=PlaylistRoute)
+    webapp2.Route('/playlist/<Playlist>/', handler=PlaylistRoute),
+    webapp2.Route('/test/<plist>/<ext>', handler=testRoute)
 ], debug=True)

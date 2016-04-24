@@ -92,7 +92,7 @@
             <span class="nav nav-center page-title">{% block navTitle %}Snippet Playlists{% endblock %}</span>
 
             {% block navRight %}
-                {{ navRightButton("Create Playlist", "plus", "/create/", theme="success") }}
+                {{ navRightButton("Create Playlist", "plus", "/playlist/?action=create", theme="success") }}
             {% endblock %}
 
           </div>
@@ -129,7 +129,7 @@
             {% endfor %}
         {% else %}
             <div class="empty">There are currently no playlists</div>
-            <a href="/create/" type="button" class="btn btn-success">
+            <a href="/playlist/?action=create" type="button" class="btn btn-success">
               <span class="glyphicon glyphicon-plus"></span>Create Playlist
             </a>
         {% endif %}
