@@ -91,13 +91,13 @@ class MainHandler(handler.Handler):
         ]
 
         # store new data
-        ndb.put_multi(playlists)
+        #ndb.put_multi(playlists)
 
-        for p,snpts in zip(playlists, snippets):
+        for p, snpts in zip(playlists, snippets):
             k=p.put()
             for snp in snpts:
                 snp.parent = k
-                p.snippets.append(snp.put())
+                p.snippetKeys.append(snp.put())
             p.put()
 
 
@@ -122,7 +122,7 @@ class MainHandler(handler.Handler):
         self.response.headers['Content-Type'] = 'text/plain'
         for p in models.Playlist.getAll():
             self.response.write("%r\n"%p)
-            for snp in p.snippets:
+            for snp in p.snippetKeys:
                 snp = snp.get()
                 self.response.write("%r\n"%snp)
             self.response.write("url: %s\n"%p.keyForLink())
@@ -135,8 +135,8 @@ class viewOne(handler.PlaylistHandler):
         # self.response.write("%r\n" % playlist)
         # self.response.write("%r\n" % playlist.getSnippetsFromPlaylist())
         print playlist
-        print playlist.getSnippetsFromPlaylist()
-        self.render("viewAll.html", var={'playlists': playlist, 'snippets': playlist.getSnippetsFromPlaylist()})
+        #print playlist.getSnippetsFromPlaylist()
+        self.render("view.html", var={'playlist': playlist})
 
 app = webapp2.WSGIApplication([
     webapp2.Route('/testData/playlist/<Playlist>/', handler=viewOne),

@@ -14,7 +14,7 @@ class Snippet(ndb.Model):
     endTime = ndb.IntegerProperty(indexed=False, required=True)
 
     # Used in debugging, GAE makes use of __str__ so toString is used by me
-    def toString(self): return str(self.__dict__)
+    #def toString(self): return str(self.__dict__)
 
 
 class Playlist(ndb.Model):
@@ -22,16 +22,16 @@ class Playlist(ndb.Model):
 
     title = ndb.StringProperty(indexed=False, required=True)
     creator = ndb.StringProperty(indexed=False, required=True, default="Anonymous")
-    snippets = ndb.KeyProperty(kind=Snippet, repeated=True, indexed=False)
+    snippetKeys = ndb.KeyProperty(kind=Snippet, repeated=True, indexed=False)
     date_added = ndb.DateTimeProperty(auto_now_add=True)
 
 
     # Used in debugging, GAE makes use of __str__ so toString is used by me
-    def toString(self):
-        st = str(self.title)
-        st += str(self.creator)
-        for snip in self.snippets: st += snip.toString() + '\n'
-        return st
+    # def toString(self):
+    #     st = str(self.title)
+    #     st += str(self.creator)
+    #     for snip in self.snippets: st += snip.toString() + '\n'
+    #     return st
 
     # todo need to use URLs instead
     # def keyForForm(self):
@@ -69,10 +69,11 @@ class Playlist(ndb.Model):
             return None
 
         # todo reconstruct selected thumbnail
+        plist.snippets = ndb.get_multi(plist.snippetKeys)
         return plist
 
-    def getSnippetsFromPlaylist(self):
-        return ndb.get_multi(self.snippets)
+    # def getSnippetsFromPlaylist(self):
+    #     return ndb.get_multi(self.snippetKeys)
 
     @staticmethod
     def createAndStore(kv):
