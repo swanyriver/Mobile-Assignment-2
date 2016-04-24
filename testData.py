@@ -120,19 +120,25 @@ class MainHandler(handler.Handler):
         #self.response.write("Testing Data populated")
 
         self.response.headers['Content-Type'] = 'text/plain'
-        for p in models.Playlist.query():
+        for p in models.Playlist.getAll():
             self.response.write("%r\n"%p)
             for snp in p.snippets:
                 snp = snp.get()
                 self.response.write("%r\n"%snp)
+            self.response.write("url: %s\n"%p.keyForLink())
             self.response.write("----------------------------------------\n")
 
 
-class viewOne(handler.Handler):
-    def get(self):
-        self.render("viewAll.html", var={'playlists': [models.Playlist.getPlaylistFromRequest(self.request)]})
+class viewOne(handler.PlaylistHandler):
+    def getPlaylist(self, playlist):
+        # self.response.headers['Content-Type'] = 'text/plain'
+        # self.response.write("%r\n" % playlist)
+        # self.response.write("%r\n" % playlist.getSnippetsFromPlaylist())
+        print playlist
+        print playlist.getSnippetsFromPlaylist()
+        self.render("viewAll.html", var={'playlists': playlist, 'snippets': playlist.getSnippetsFromPlaylist()})
 
 app = webapp2.WSGIApplication([
-    ('/testData/playlist/', viewOne),
+    webapp2.Route('/testData/playlist/<Playlist>/', handler=viewOne),
     ('/testData/', MainHandler)
 ], debug=True)

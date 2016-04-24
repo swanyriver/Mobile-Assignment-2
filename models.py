@@ -18,7 +18,7 @@ class Snippet(ndb.Model):
 
 
 class Playlist(ndb.Model):
-    AnonymousParent = ndb.Key(__name__, "Anonymous")
+    AnonymousParent = ndb.Key('Playlist', "Anonymous")
 
     title = ndb.StringProperty(indexed=False, required=True)
     creator = ndb.StringProperty(indexed=False, required=True, default="Anonymous")
@@ -37,14 +37,12 @@ class Playlist(ndb.Model):
     # def keyForForm(self):
     #     return "<input type=\"hidden\" name=\"%s\" value=\"%s\"></input>"%(Playlist.__name__, self.key.urlsafe())
 
-    # todo need to use URLs instead
-    # @staticmethod
-    # def keyForLinkFromKey(key):
-    #     return "%s=%s" % (Playlist.__name__, key.urlsafe())
+    @staticmethod
+    def keyForLinkFromKey(key):
+        return "/playlist/%s/" % (key.urlsafe())
 
-    #todo need to use URLS instead
-    # def keyForLink(self):
-    #     return Playlist.keyForLinkFromKey(self.key)
+    def keyForLink(self):
+        return Playlist.keyForLinkFromKey(self.key)
 
     @staticmethod
     def getAll(ancestor=None):
@@ -54,26 +52,27 @@ class Playlist(ndb.Model):
             return pquery.fetch()
         #todo test this, homepage, get all
         else:
-            q = Playlist.query()
-            return list(q)
+            return Playlist.query()
 
 
     #todo get from url
-    @staticmethod
-    def getPlaylistFromRequest(kwargs):
-        if 'Playlist' not in kwargs:
-            return None
+    @classmethod
+    def getPlaylistFromURL(cls, kwargs):
+        if cls.__name__ not in kwargs: return None
         try:
-            pkey = ndb.Key(urlsafe=kwargs['Playlist'])
+            pkey = ndb.Key(urlsafe=kwargs[cls.__name__])
             print pkey
             plist = pkey.get()
+            print plist
         except:
             print sys.exc_info()[0]
             return None
 
-        plist.snippets = ndb.get_multi(plist.snippets)
         # todo reconstruct selected thumbnail
         return plist
+
+    def getSnippetsFromPlaylist(self):
+        return ndb.get_multi(self.snippets)
 
     @staticmethod
     def createAndStore(kv):

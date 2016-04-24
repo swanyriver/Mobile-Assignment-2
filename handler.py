@@ -53,7 +53,7 @@ class Handler(webapp2.RequestHandler):
 
 class PlaylistHandler(Handler):
     def get(self, **kwargs):
-        playlist = models.Playlist.getPlaylistFromRequest(kwargs)
+        playlist = models.Playlist.getPlaylistFromURL(kwargs)
 
         if not playlist:
             return self.redirect("/?" + Handler.warning("Playlist not found"))
