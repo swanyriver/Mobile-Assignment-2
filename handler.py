@@ -51,7 +51,7 @@ class Handler(webapp2.RequestHandler):
     def returnJSON(self, jsonSt, code=200, message=None):
         self.response.set_status(code, message)
         self.response.headers['Content-Type'] = 'application/json'
-        self.response.out.write(jsonSt or '{}')
+        self.response.write(jsonSt or '{}')
 
 
 class PlaylistHandler(Handler):

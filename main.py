@@ -120,7 +120,7 @@ class PlaylistRoute(PlaylistHandler):
 
     # def putPlaylist(self):
     #     # todo move delete from list and reorder list to here
-        pass
+    #    pass
 
     def deletePlaylist(self, playlist):
         for k in playlist.snippetKeys:
@@ -135,6 +135,16 @@ class SnippetRoute(Handler):
         if not snpt:
             return self.returnJSON(None, code=404)
         self.render("snippet.html", var={'snippet':snpt})
+
+    def put(self, **kwargs):
+        snpt = models.Snippet.getSnippetFromURL(kwargs)
+        if not snpt:
+            return self.returnJSON(None, code=404)
+        #update record
+        snpt.populate(**models.getPopulateDictionary(models.Snippet, self.request.POST.items()))
+        snpt.put()
+        return self.returnJSON(snpt.json(), code=200, message="snippet updated")
+
 
     def delete(self, **kwargs):
         snpt = models.Snippet.getSnippetFromURL(kwargs)

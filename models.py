@@ -2,6 +2,12 @@ from google.appengine.ext import ndb
 import sys
 import json
 
+# dumps = json.dumps
+# def prettyJson(obj):
+#     return dumps(obj, indent=2)
+# json.dumps = prettyJson
+
+
 def getPopulateDictionary(model_class, request):
     return {k: int(v) if isinstance(getattr(model_class, k), ndb.IntegerProperty) else v for k, v in request if k in model_class._properties }
 
