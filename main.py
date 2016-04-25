@@ -123,7 +123,7 @@ class PlaylistRoute(PlaylistHandler):
 
     def deletePlaylist(self, playlist):
         for k in playlist.snippetKeys:
-            k.key.delete()
+            k.delete()
         playlist.key.delete()
         return self.returnJSON(None, code=202, message="playlist deleted")
 

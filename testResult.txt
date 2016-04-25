@@ -1,0 +1,258 @@
+Retrieving all existing playlists
+[
+  {
+    "snippetKeys": [
+      5105650963054592, 
+      5757334940811264, 
+      5639274879778816
+    ], 
+    "title": "Playlist B", 
+    "url": "/playlist/ahFzfnN3YW5zb25iYXNzaWduM3IsCxIIUGxheWxpc3QiCUFub255bW91cwwLEghQbGF5bGlzdBiAgICAgNeMCgw/", 
+    "creator": "Anonymous", 
+    "json": "/playlist/ahFzfnN3YW5zb25iYXNzaWduM3IsCxIIUGxheWxpc3QiCUFub255bW91cwwLEghQbGF5bGlzdBiAgICAgNeMCgw.json", 
+    "Key": 5685265389584384
+  }, 
+  {
+    "snippetKeys": [
+      5066549580791808, 
+      5750085036015616, 
+      5657382461898752
+    ], 
+    "title": "Playlist A", 
+    "url": "/playlist/ahFzfnN3YW5zb25iYXNzaWduM3ItCxIIUGxheWxpc3QiCmFAbWFpbC5jb20MCxIIUGxheWxpc3QYgICAgMDhigoM/", 
+    "creator": "a@mail.com", 
+    "json": "/playlist/ahFzfnN3YW5zb25iYXNzaWduM3ItCxIIUGxheWxpc3QiCmFAbWFpbC5jb20MCxIIUGxheWxpc3QYgICAgMDhigoM.json", 
+    "Key": 5676830073815040
+  }, 
+  {
+    "snippetKeys": [
+      6248215343005696
+    ], 
+    "title": "Playlist C", 
+    "url": "/playlist/ahFzfnN3YW5zb25iYXNzaWduM3ItCxIIUGxheWxpc3QiCmFAbWFpbC5jb20MCxIIUGxheWxpc3QYgICAgICumQsM/", 
+    "creator": "a@mail.com", 
+    "json": "/playlist/ahFzfnN3YW5zb25iYXNzaWduM3ItCxIIUGxheWxpc3QiCmFAbWFpbC5jb20MCxIIUGxheWxpc3QYgICAgICumQsM.json", 
+    "Key": 6303981198376960
+  }
+]
+Deleting all existing playlists and snippets
+SENDING CURL CALL:  curl -X DELETE http://swansonbassign3.appspot.com/playlist/ahFzfnN3YW5zb25iYXNzaWduM3IsCxIIUGxheWxpc3QiCUFub255bW91cwwLEghQbGF5bGlzdBiAgICAgNeMCgw/
+{}
+SENDING CURL CALL:  curl -X DELETE http://swansonbassign3.appspot.com/playlist/ahFzfnN3YW5zb25iYXNzaWduM3ItCxIIUGxheWxpc3QiCmFAbWFpbC5jb20MCxIIUGxheWxpc3QYgICAgMDhigoM/
+{}
+SENDING CURL CALL:  curl -X DELETE http://swansonbassign3.appspot.com/playlist/ahFzfnN3YW5zb25iYXNzaWduM3ItCxIIUGxheWxpc3QiCmFAbWFpbC5jb20MCxIIUGxheWxpc3QYgICAgICumQsM/
+{}
+checking that all existing playlists were deleted
+[]
+Creating Test data
+create 3 playlists and after creating each one create and associate snippets
+{'creator': 'a@mail.com', 'title': 'Playlist A'} [{'notes': 'check this out', 'endTime': 15, 'videoID': 'ByQD6tAE2yU', 'startTime': 0, 'title': 'hertz1'}, {'endTime': 55, 'videoID': 'ByQD6tAE2yU', 'startTime': 30, 'title': 'heartz2'}, {'notes': 'here is a different lookout', 'endTime': 120, 'videoID': 'YLZoPcGKq7M', 'startTime': 65, 'title': 'ute'}]
+SENDING CURL CALL:  curl --data "creator=a@mail.com&title=Playlist A" -X POST http://swansonbassign3.appspot.com
+{
+  "url": "/playlist/ahFzfnN3YW5zb25iYXNzaWduM3ItCxIIUGxheWxpc3QiCmFAbWFpbC5jb20MCxIIUGxheWxpc3QYgICAgMD6kwsM/", 
+  "json": "/playlist/ahFzfnN3YW5zb25iYXNzaWduM3ItCxIIUGxheWxpc3QiCmFAbWFpbC5jb20MCxIIUGxheWxpc3QYgICAgMD6kwsM.json"
+}
+adding snippets
+SENDING CURL CALL:  curl --data "notes=check this out&endTime=15&videoID=ByQD6tAE2yU&startTime=0&title=hertz1" -X POST http://swansonbassign3.appspot.com/playlist/ahFzfnN3YW5zb25iYXNzaWduM3ItCxIIUGxheWxpc3QiCmFAbWFpbC5jb20MCxIIUGxheWxpc3QYgICAgMD6kwsM/
+{
+  "snippet": {
+    "startTime": 0, 
+    "title": "hertz1", 
+    "url": "/snippet/ahFzfnN3YW5zb25iYXNzaWduM3JBCxIIUGxheWxpc3QiCmFAbWFpbC5jb20MCxIIUGxheWxpc3QYgICAgMD6kwsMCxIHU25pcHBldBiAgICAwLWbCQw/", 
+    "notes": "check this out", 
+    "videoID": "ByQD6tAE2yU", 
+    "json": "/snippet/ahFzfnN3YW5zb25iYXNzaWduM3JBCxIIUGxheWxpc3QiCmFAbWFpbC5jb20MCxIIUGxheWxpc3QYgICAgMD6kwsMCxIHU25pcHBldBiAgICAwLWbCQw.json", 
+    "Key": 5187135082594304, 
+    "endTime": 15
+  }, 
+  "result": "snippet created"
+}
+SENDING CURL CALL:  curl --data "endTime=55&videoID=ByQD6tAE2yU&startTime=30&title=heartz2" -X POST http://swansonbassign3.appspot.com/playlist/ahFzfnN3YW5zb25iYXNzaWduM3ItCxIIUGxheWxpc3QiCmFAbWFpbC5jb20MCxIIUGxheWxpc3QYgICAgMD6kwsM/
+{
+  "snippet": {
+    "startTime": 30, 
+    "title": "heartz2", 
+    "url": "/snippet/ahFzfnN3YW5zb25iYXNzaWduM3JBCxIIUGxheWxpc3QiCmFAbWFpbC5jb20MCxIIUGxheWxpc3QYgICAgMD6kwsMCxIHU25pcHBldBiAgICAgICACww/", 
+    "notes": null, 
+    "videoID": "ByQD6tAE2yU", 
+    "json": "/snippet/ahFzfnN3YW5zb25iYXNzaWduM3JBCxIIUGxheWxpc3QiCmFAbWFpbC5jb20MCxIIUGxheWxpc3QYgICAgMD6kwsMCxIHU25pcHBldBiAgICAgICACww.json", 
+    "Key": 6192449487634432, 
+    "endTime": 55
+  }, 
+  "result": "snippet created"
+}
+SENDING CURL CALL:  curl --data "notes=here is a different lookout&endTime=120&videoID=YLZoPcGKq7M&startTime=65&title=ute" -X POST http://swansonbassign3.appspot.com/playlist/ahFzfnN3YW5zb25iYXNzaWduM3ItCxIIUGxheWxpc3QiCmFAbWFpbC5jb20MCxIIUGxheWxpc3QYgICAgMD6kwsM/
+{
+  "snippet": {
+    "startTime": 65, 
+    "title": "ute", 
+    "url": "/snippet/ahFzfnN3YW5zb25iYXNzaWduM3JBCxIIUGxheWxpc3QiCmFAbWFpbC5jb20MCxIIUGxheWxpc3QYgICAgMD6kwsMCxIHU25pcHBldBiAgICAwN-XCgw/", 
+    "notes": "here is a different lookout", 
+    "videoID": "YLZoPcGKq7M", 
+    "json": "/snippet/ahFzfnN3YW5zb25iYXNzaWduM3JBCxIIUGxheWxpc3QiCmFAbWFpbC5jb20MCxIIUGxheWxpc3QYgICAgMD6kwsMCxIHU25pcHBldBiAgICAwN-XCgw.json", 
+    "Key": 5733935958982656, 
+    "endTime": 120
+  }, 
+  "result": "snippet created"
+}
+{'title': 'Playlist B'} [{'endTime': 5, 'videoID': 'TLBIufF7G1I', 'startTime': 0, 'title': 'top of the morning'}, {'notes': 'super truck super truck super truck super truck', 'endTime': 400, 'videoID': 'TLBIufF7G1I', 'startTime': 20, 'title': 'jack truck'}, {'notes': '<Like a Boss!!!!>', 'endTime': 887, 'videoID': 'TLBIufF7G1I', 'startTime': 882, 'title': 'punch the like button'}]
+SENDING CURL CALL:  curl --data "title=Playlist B" -X POST http://swansonbassign3.appspot.com
+{
+  "url": "/playlist/ahFzfnN3YW5zb25iYXNzaWduM3IsCxIIUGxheWxpc3QiCUFub255bW91cwwLEghQbGF5bGlzdBiAgICAwPqTCgw/", 
+  "json": "/playlist/ahFzfnN3YW5zb25iYXNzaWduM3IsCxIIUGxheWxpc3QiCUFub255bW91cwwLEghQbGF5bGlzdBiAgICAwPqTCgw.json"
+}
+adding snippets
+SENDING CURL CALL:  curl --data "endTime=5&videoID=TLBIufF7G1I&startTime=0&title=top of the morning" -X POST http://swansonbassign3.appspot.com/playlist/ahFzfnN3YW5zb25iYXNzaWduM3IsCxIIUGxheWxpc3QiCUFub255bW91cwwLEghQbGF5bGlzdBiAgICAwPqTCgw/
+{
+  "snippet": {
+    "startTime": 0, 
+    "title": "top of the morning", 
+    "url": "/snippet/ahFzfnN3YW5zb25iYXNzaWduM3JACxIIUGxheWxpc3QiCUFub255bW91cwwLEghQbGF5bGlzdBiAgICAwPqTCgwLEgdTbmlwcGV0GICAgIDA4YoKDA/", 
+    "notes": null, 
+    "videoID": "TLBIufF7G1I", 
+    "json": "/snippet/ahFzfnN3YW5zb25iYXNzaWduM3JACxIIUGxheWxpc3QiCUFub255bW91cwwLEghQbGF5bGlzdBiAgICAwPqTCgwLEgdTbmlwcGV0GICAgIDA4YoKDA.json", 
+    "Key": 5676830073815040, 
+    "endTime": 5
+  }, 
+  "result": "snippet created"
+}
+SENDING CURL CALL:  curl --data "notes=super truck super truck super truck super truck&endTime=400&videoID=TLBIufF7G1I&startTime=20&title=jack truck" -X POST http://swansonbassign3.appspot.com/playlist/ahFzfnN3YW5zb25iYXNzaWduM3IsCxIIUGxheWxpc3QiCUFub255bW91cwwLEghQbGF5bGlzdBiAgICAwPqTCgw/
+{
+  "snippet": {
+    "startTime": 20, 
+    "title": "jack truck", 
+    "url": "/snippet/ahFzfnN3YW5zb25iYXNzaWduM3JACxIIUGxheWxpc3QiCUFub255bW91cwwLEghQbGF5bGlzdBiAgICAwPqTCgwLEgdTbmlwcGV0GICAgIDAtZsKDA/", 
+    "notes": "super truck super truck super truck super truck", 
+    "videoID": "TLBIufF7G1I", 
+    "json": "/snippet/ahFzfnN3YW5zb25iYXNzaWduM3JACxIIUGxheWxpc3QiCUFub255bW91cwwLEghQbGF5bGlzdBiAgICAwPqTCgwLEgdTbmlwcGV0GICAgIDAtZsKDA.json", 
+    "Key": 5750085036015616, 
+    "endTime": 400
+  }, 
+  "result": "snippet created"
+}
+SENDING CURL CALL:  curl --data "notes=<Like a Boss!!!!>&endTime=887&videoID=TLBIufF7G1I&startTime=882&title=punch the like button" -X POST http://swansonbassign3.appspot.com/playlist/ahFzfnN3YW5zb25iYXNzaWduM3IsCxIIUGxheWxpc3QiCUFub255bW91cwwLEghQbGF5bGlzdBiAgICAwPqTCgw/
+{
+  "snippet": {
+    "startTime": 882, 
+    "title": "punch the like button", 
+    "url": "/snippet/ahFzfnN3YW5zb25iYXNzaWduM3JACxIIUGxheWxpc3QiCUFub255bW91cwwLEghQbGF5bGlzdBiAgICAwPqTCgwLEgdTbmlwcGV0GICAgICA8ogLDA/", 
+    "notes": "<Like a Boss!!!!>", 
+    "videoID": "TLBIufF7G1I", 
+    "json": "/snippet/ahFzfnN3YW5zb25iYXNzaWduM3JACxIIUGxheWxpc3QiCUFub255bW91cwwLEghQbGF5bGlzdBiAgICAwPqTCgwLEgdTbmlwcGV0GICAgICA8ogLDA.json", 
+    "Key": 6231550869897216, 
+    "endTime": 887
+  }, 
+  "result": "snippet created"
+}
+{'creator': 'a@mail.com', 'title': 'Playlist C'} [{'endTime': 21, 'videoID': 'vrjAIBgxm_w', 'startTime': 20, 'title': 'short computerphile'}]
+SENDING CURL CALL:  curl --data "creator=a@mail.com&title=Playlist C" -X POST http://swansonbassign3.appspot.com
+{
+  "url": "/playlist/ahFzfnN3YW5zb25iYXNzaWduM3ItCxIIUGxheWxpc3QiCmFAbWFpbC5jb20MCxIIUGxheWxpc3QYgICAgIDDlQkM/", 
+  "json": "/playlist/ahFzfnN3YW5zb25iYXNzaWduM3ItCxIIUGxheWxpc3QiCmFAbWFpbC5jb20MCxIIUGxheWxpc3QYgICAgIDDlQkM.json"
+}
+adding snippets
+SENDING CURL CALL:  curl --data "endTime=21&videoID=vrjAIBgxm_w&startTime=20&title=short computerphile" -X POST http://swansonbassign3.appspot.com/playlist/ahFzfnN3YW5zb25iYXNzaWduM3ItCxIIUGxheWxpc3QiCmFAbWFpbC5jb20MCxIIUGxheWxpc3QYgICAgIDDlQkM/
+{
+  "snippet": {
+    "startTime": 20, 
+    "title": "short computerphile", 
+    "url": "/snippet/ahFzfnN3YW5zb25iYXNzaWduM3JBCxIIUGxheWxpc3QiCmFAbWFpbC5jb20MCxIIUGxheWxpc3QYgICAgIDDlQkMCxIHU25pcHBldBiAgICAoMSOCgw/", 
+    "notes": null, 
+    "videoID": "vrjAIBgxm_w", 
+    "json": "/snippet/ahFzfnN3YW5zb25iYXNzaWduM3JBCxIIUGxheWxpc3QiCmFAbWFpbC5jb20MCxIIUGxheWxpc3QYgICAgIDDlQkMCxIHU25pcHBldBiAgICAoMSOCgw.json", 
+    "Key": 5693417237512192, 
+    "endTime": 21
+  }, 
+  "result": "snippet created"
+}
+Retrieving all existing playlists
+[
+  {
+    "snippetKeys": [
+      5676830073815040, 
+      5750085036015616, 
+      6231550869897216
+    ], 
+    "title": "Playlist B", 
+    "url": "/playlist/ahFzfnN3YW5zb25iYXNzaWduM3IsCxIIUGxheWxpc3QiCUFub255bW91cwwLEghQbGF5bGlzdBiAgICAwPqTCgw/", 
+    "creator": "Anonymous", 
+    "json": "/playlist/ahFzfnN3YW5zb25iYXNzaWduM3IsCxIIUGxheWxpc3QiCUFub255bW91cwwLEghQbGF5bGlzdBiAgICAwPqTCgw.json", 
+    "Key": 5717271485874176
+  }, 
+  {
+    "snippetKeys": [
+      5693417237512192
+    ], 
+    "title": "Playlist C", 
+    "url": "/playlist/ahFzfnN3YW5zb25iYXNzaWduM3ItCxIIUGxheWxpc3QiCmFAbWFpbC5jb20MCxIIUGxheWxpc3QYgICAgIDDlQkM/", 
+    "creator": "a@mail.com", 
+    "json": "/playlist/ahFzfnN3YW5zb25iYXNzaWduM3ItCxIIUGxheWxpc3QiCmFAbWFpbC5jb20MCxIIUGxheWxpc3QYgICAgIDDlQkM.json", 
+    "Key": 5161210659995648
+  }, 
+  {
+    "snippetKeys": [
+      5187135082594304, 
+      6192449487634432, 
+      5733935958982656
+    ], 
+    "title": "Playlist A", 
+    "url": "/playlist/ahFzfnN3YW5zb25iYXNzaWduM3ItCxIIUGxheWxpc3QiCmFAbWFpbC5jb20MCxIIUGxheWxpc3QYgICAgMD6kwsM/", 
+    "creator": "a@mail.com", 
+    "json": "/playlist/ahFzfnN3YW5zb25iYXNzaWduM3ItCxIIUGxheWxpc3QiCmFAbWFpbC5jb20MCxIIUGxheWxpc3QYgICAgMD6kwsM.json", 
+    "Key": 6280221439295488
+  }
+]
+getting json of one snippet
+SENDING CURL CALL:  curl http://swansonbassign3.appspot.com/playlist/ahFzfnN3YW5zb25iYXNzaWduM3IsCxIIUGxheWxpc3QiCUFub255bW91cwwLEghQbGF5bGlzdBiAgICAwPqTCgw.json
+{
+  "snippetKeys": [
+    5676830073815040, 
+    5750085036015616, 
+    6231550869897216
+  ], 
+  "title": "Playlist B", 
+  "creator": "Anonymous", 
+  "Key": 5717271485874176, 
+  "snippets": [
+    {
+      "startTime": 0, 
+      "title": "top of the morning", 
+      "url": "/snippet/ahFzfnN3YW5zb25iYXNzaWduM3JACxIIUGxheWxpc3QiCUFub255bW91cwwLEghQbGF5bGlzdBiAgICAwPqTCgwLEgdTbmlwcGV0GICAgIDA4YoKDA/", 
+      "notes": null, 
+      "videoID": "TLBIufF7G1I", 
+      "json": "/snippet/ahFzfnN3YW5zb25iYXNzaWduM3JACxIIUGxheWxpc3QiCUFub255bW91cwwLEghQbGF5bGlzdBiAgICAwPqTCgwLEgdTbmlwcGV0GICAgIDA4YoKDA.json", 
+      "Key": 5676830073815040, 
+      "endTime": 5
+    }, 
+    {
+      "startTime": 20, 
+      "title": "jack truck", 
+      "url": "/snippet/ahFzfnN3YW5zb25iYXNzaWduM3JACxIIUGxheWxpc3QiCUFub255bW91cwwLEghQbGF5bGlzdBiAgICAwPqTCgwLEgdTbmlwcGV0GICAgIDAtZsKDA/", 
+      "notes": "super truck super truck super truck super truck", 
+      "videoID": "TLBIufF7G1I", 
+      "json": "/snippet/ahFzfnN3YW5zb25iYXNzaWduM3JACxIIUGxheWxpc3QiCUFub255bW91cwwLEghQbGF5bGlzdBiAgICAwPqTCgwLEgdTbmlwcGV0GICAgIDAtZsKDA.json", 
+      "Key": 5750085036015616, 
+      "endTime": 400
+    }, 
+    {
+      "startTime": 882, 
+      "title": "punch the like button", 
+      "url": "/snippet/ahFzfnN3YW5zb25iYXNzaWduM3JACxIIUGxheWxpc3QiCUFub255bW91cwwLEghQbGF5bGlzdBiAgICAwPqTCgwLEgdTbmlwcGV0GICAgICA8ogLDA/", 
+      "notes": "<Like a Boss!!!!>", 
+      "videoID": "TLBIufF7G1I", 
+      "json": "/snippet/ahFzfnN3YW5zb25iYXNzaWduM3JACxIIUGxheWxpc3QiCUFub255bW91cwwLEghQbGF5bGlzdBiAgICAwPqTCgwLEgdTbmlwcGV0GICAgICA8ogLDA.json", 
+      "Key": 6231550869897216, 
+      "endTime": 887
+    }
+  ]
+}
+updating values of a snippet
+/snippet/ahFzfnN3YW5zb25iYXNzaWduM3JACxIIUGxheWxpc3QiCUFub255bW91cwwLEghQbGF5bGlzdBiAgICAwPqTCgwLEgdTbmlwcGV0GICAgIDA4YoKDA/
+SENDING CURL CALL:  curl --data "startTime=40&title=new title" -X PUT http://swansonbassign3.appspot.com/snippet/ahFzfnN3YW5zb25iYXNzaWduM3JACxIIUGxheWxpc3QiCUFub255bW91cwwLEghQbGF5bGlzdBiAgICAwPqTCgwLEgdTbmlwcGV0GICAgIDA4YoKDA/
+{
+  "notes": null, 
+  "endTime": 5, 
+  "videoID": "TLBIufF7G1I", 
+  "startTime": 40, 
+  "title": "new title"
+}

@@ -146,7 +146,12 @@ class Playlist(ndb.Model):
 
     @staticmethod
     def createAndStore(kv):
-        newPlaylist = Playlist(parent=ndb.Key(Playlist, kv.get['creator']) if 'creator' in kv else Playlist.AnonymousParent)
-        newPlaylist.populate(**kv)
+        # newPlaylist = Playlist(parent=ndb.Key(Playlist, kv['creator'] if 'creator' in kv else Playlist.AnonymousParent))
+        # newPlaylist.populate(**kv)
+        k = ndb.Key(Playlist, kv['creator']) if 'creator' in kv else Playlist.AnonymousParent
+        newPlaylist = Playlist(parent = k)
+        if 'creator' in kv: newPlaylist.creator = kv['creator']
+        newPlaylist.title = kv['title']
+
         return newPlaylist.put()
 
