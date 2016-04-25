@@ -17,9 +17,7 @@ from handler import Handler, PlaylistHandler
 import models
 import credentials
 import json
-import sys
 from google.appengine.api import urlfetch
-from google.appengine.ext import ndb
 
 
 class MainHandler(Handler):
@@ -30,17 +28,15 @@ class MainHandler(Handler):
 # return json of all playlists
 class allplaylistsJson(Handler):
     def get(self):
-        #todo create json of all playlists from models.Playlist.getAll()
-        return self.returnJSON('this is where the json will be')
+        return self.returnJSON(
+            [p._to_dict() for p in models.Playlist.query()]
+        )
 
 
 # create playlist or return all playlists html
 class PlaylistMain(Handler):
     def get(self):
-        if self.getReqVal(Handler.ACTION) == "create":
-            self.render("create.html")
-        else:
-            self.render("main.html", var={'playlists': models.Playlist.getAll()})
+        self.render("main.html", var={'playlists': models.Playlist.getAll()})
 
     #create playlists
     def post(self):
@@ -61,134 +57,207 @@ class PlaylistMain(Handler):
                                         'json':models.Playlist.jsonLinkfromKey(key)}), code=201)
 
 
-
-    def put(self):
-        # todo move delete from list and reorder list to here
-        pass
-
-
 class JSONGetter(Handler):
     def get(self, **kwargs):
+        if models.Snippet.__name__ in kwargs:
+            snpt = models.Snippet.getSnippetFromURL(kwargs)
+            if not snpt:
+                return self.returnJSON(None, code=404)
+            return self.returnJSON(snpt.json())
+
         if models.Playlist.__name__ in kwargs:
             plist = models.Playlist.getPlaylistFromURL(kwargs)
             if not plist:
                 return self.returnJSON(None, code=404)
             return self.returnJSON(plist.json())
 
+
+
+# for specific playlists
+# /playlist/<playlist>/
 class PlaylistRoute(PlaylistHandler):
     def getPlaylist(self, playlist):
+        print "here is the playlist", playlist, playlist.snippets
         self.render("view.html", {"playlist": playlist})
 
-    #add a snippet or edit them
-    def postPlaylist(self, ):
-        pass
-
-
-#todo subsume other handlers as verbs
-
-
-class addHandler(Handler):
-    def get(self):
-        playlist = models.Playlist.getPlaylistFromRequest(self.request)
-        if not playlist:
-            return self.redirect('/?' + Handler.warning("Playlist not found"))
-        self.render("add.html", var={"playlist": playlist})
-
-    def post(self):
-        playlist = models.Playlist.getPlaylistFromRequest(self.request)
-
-        if not playlist:
-            return self.redirect("/?" + Handler.warning("Playlist not found"))
+    #add a snippet
+    def postPlaylist(self, playlist):
+        print self.request.POST
         if any((k not in self.request.POST or not self.request.POST[k] for k in
                 ("title", "videoID", "startTime", "endTime"))):
-            return self.redirect('/add/?' + Handler.warning("required fields not found") + '&' + playlist.keyForLink())
+            return self.returnJSON(None, code=400, message="Required fields not included")
 
-        self.response.write(models.getPopulateDictionary(models.Snippet, self.request.POST.items()))
+        print models.getPopulateDictionary(models.Snippet, self.request.POST.items())
 
         # validate videoID
-        # add part=id,snippet to get title from snippet object
         result = urlfetch.fetch("https://www.googleapis.com/youtube/v3/videos?id=%s&key=%s&part=id" % (
             self.request.get('videoID'), credentials.API_KEY))
         if result.status_code != 200:
-            return self.redirect("/add/?%s&%s" %
-                                 (playlist.keyForLink(), Handler.warning("Youtube unreachable to verify videoID")))
+            return self.returnJSON(None, code=400, message="Invalid YouTube VideoID")
 
         videoJSON = json.loads(result.content)
         if not videoJSON['pageInfo']['totalResults']:
-            # todo repopulate fields
-            return self.redirect("/add/?%s&%s" %
-                                 (playlist.keyForLink(), Handler.warning("Invalid YouTube VideoID")))
+            return self.returnJSON(None, code=400, message="Invalid YouTube VideoID")
 
         # create snippet
         newSnippet = models.Snippet(**models.getPopulateDictionary(models.Snippet, self.request.POST.items()))
         # todo validate that start/end times are 0 <= startTime < endTime <= videoLength,  youtube embedd fails gracefully for now
 
-
-        # add it to playlist and put playlist
-        playlist.snippets.append(newSnippet)
+        # put in datastore, then add to playlist
+        newSnippet.parent= playlist
+        snptKey = newSnippet.put()
+        playlist.snippetKeys.append(snptKey)
         playlist.put()
 
-        # redirect to view with playlist and status
-        return self.redirect("/view/?%s&%s" %
-                             (playlist.keyForLink(), Handler.status("Snippet added to playlist")))
+        # return json with status
+        dictout = {"result":"snippet created",
+                    "url":models.Snippet.keyForLinkFromKey(snptKey),
+                   "json":models.Snippet.jsonLinkfromKey(snptKey),
+                   "snippet":snptKey.get()._to_dict()}
+        return self.returnJSON(json.dumps(dictout), code=201)
 
+    def putPlaylist(self):
+        # todo move delete from list and reorder list to here
+        pass
 
-
-class delHandler(PlaylistHandler):
-    def getPlaylist(self, playlist):
+    def deletePlaylist(self, playlist):
+        for k in playlist.snippetKeys:
+            k.key.delete()
         playlist.key.delete()
-        return self.redirect("/?" + Handler.status("Playlist Deleted"))
+        return self.returnJSON(None, code=202, message="playlist deleted")
+
+#todo subsume other handlers as verbs
+
+#for specific snippets
+class SnippetRoute(Handler):
+    def get(self, **kwargs):
+        snpt = models.Snippet.getSnippetFromURL(kwargs)
+        if not snpt:
+            return self.returnJSON(None, code=404)
+        self.render("snippet.html", var={'snippet':snpt})
+
+    def delete(self, **kwargs):
+        snpt = models.Snippet.getSnippetFromURL(kwargs)
+        if not snpt:
+            return self.returnJSON(None, code=404)
+        #plist = snpt.Parent.get()
+        #print plist
+        print snpt
 
 
-class delSnippetHandler(PlaylistHandler):
-    def getPlaylist(self, playlist):
-        if playlist.snippets:
-            self.render("removeSnippets.html", {'playlist': playlist, 'delete': True})
-        else:
-            return self.redirect("/view/?" + playlist.keyForLink() + '&' +
-                                 Handler.warning("This playlist has no snippets to remove"))
-
-    def post(self):
-        playlist = models.Playlist.getPlaylistFromRequest(self.request)
-        if not playlist:
-            return self.redirect("/?" + Handler.warning("Playlist not found"))
-
-        delSnippets = [int(v) for v in self.request.get_all('snippetIndex') if 0 <= int(v) < len(playlist.snippets)]
-        playlist.snippets = [s for i, s in enumerate(playlist.snippets) if i not in delSnippets]
-        playlist.put()
-
-        self.redirect("/view/?" + playlist.keyForLink())
+app = webapp2.WSGIApplication([
+    webapp2.Route('/playlist.json', allplaylistsJson),
+    webapp2.Route('/playlist/<Playlist>/', handler=PlaylistRoute),
+    webapp2.Route('/playlist/<Playlist>.json', handler=JSONGetter),
+    webapp2.Route('/snippet/<Snippet>/', handler=SnippetRoute),
+    webapp2.Route('/snippet/<Snippet>.json', handler=JSONGetter)
+], debug=True)
 
 
-class editHandler(PlaylistHandler):
-    def getPlaylist(self, playlist):
-        if playlist.snippets:
-            self.render("editPlaylist.html", {'playlist': playlist})
-        else:
-            return self.redirect("/view/?" + playlist.keyForLink() + '&' +
-                                 Handler.warning("This playlist has no snippets to edit"))
 
-    def post(self):
-        playlist = models.Playlist.getPlaylistFromRequest(self.request)
-        if not playlist:
-            return self.redirect("/?" + Handler.warning("Playlist not found"))
-        try:
-            playlist.snippets = [models.Snippet(**{
-                k: int(self.request.get(key + '_' + k)) if isinstance(getattr(models.Snippet, k),
-                                                                  ndb.IntegerProperty) else self.request.get(key + '_' + k)
-                for k in models.Snippet._properties}) for key in self.request.get_all('key')]
-        except:
-            print sys.exc_info()[0]
-            self.redirect("/view/?" + playlist.keyForLink() + '&' + Handler.warning("There was a problem applying edits"))
+##### previous handler for adding snippets
+# class addHandler(Handler):
+#     def get(self):
+#         playlist = models.Playlist.getPlaylistFromRequest(self.request)
+#         if not playlist:
+#             return self.redirect('/?' + Handler.warning("Playlist not found"))
+#         self.render("add.html", var={"playlist": playlist})
+#
+#     def post(self):
+#         playlist = models.Playlist.getPlaylistFromRequest(self.request)
+#
+#         if not playlist:
+#             return self.redirect("/?" + Handler.warning("Playlist not found"))
+#         if any((k not in self.request.POST or not self.request.POST[k] for k in
+#                 ("title", "videoID", "startTime", "endTime"))):
+#             return self.redirect('/add/?' + Handler.warning("required fields not found") + '&' + playlist.keyForLink())
+#
+#         self.response.write(models.getPopulateDictionary(models.Snippet, self.request.POST.items()))
+#
+#         # validate videoID
+#         # add part=id,snippet to get title from snippet object
+#         result = urlfetch.fetch("https://www.googleapis.com/youtube/v3/videos?id=%s&key=%s&part=id" % (
+#             self.request.get('videoID'), credentials.API_KEY))
+#         if result.status_code != 200:
+#             return self.redirect("/add/?%s&%s" %
+#                                  (playlist.keyForLink(), Handler.warning("Youtube unreachable to verify videoID")))
+#
+#         videoJSON = json.loads(result.content)
+#         if not videoJSON['pageInfo']['totalResults']:
+#             # todo repopulate fields
+#             return self.redirect("/add/?%s&%s" %
+#                                  (playlist.keyForLink(), Handler.warning("Invalid YouTube VideoID")))
+#
+#         # create snippet
+#         newSnippet = models.Snippet(**models.getPopulateDictionary(models.Snippet, self.request.POST.items()))
+#         # todo validate that start/end times are 0 <= startTime < endTime <= videoLength,  youtube embedd fails gracefully for now
+#
+#
+#         # add it to playlist and put playlist
+#         playlist.snippets.append(newSnippet)
+#         playlist.put()
+#
+#         # redirect to view with playlist and status
+#         return self.redirect("/view/?%s&%s" %
+#                              (playlist.keyForLink(), Handler.status("Snippet added to playlist")))
 
-        req_fields = models.Snippet._properties.keys()
-        req_fields.remove('notes')
 
-        if any(not v for v in [getattr(snpt, n) for snpt in playlist.snippets for n in req_fields]):
-            return self.redirect("/view/?" + playlist.keyForLink() + '&' + Handler.warning("Required fields were missing"))
 
-        playlist.put()
-        return self.redirect("/view/?" + playlist.keyForLink() + '&' + Handler.status("Edits applied to playlist"))
+# class delHandler(PlaylistHandler):
+#     def getPlaylist(self, playlist):
+#         playlist.key.delete()
+#         return self.redirect("/?" + Handler.status("Playlist Deleted"))
+#
+#
+# class delSnippetHandler(PlaylistHandler):
+#     def getPlaylist(self, playlist):
+#         if playlist.snippets:
+#             self.render("removeSnippets.html", {'playlist': playlist, 'delete': True})
+#         else:
+#             return self.redirect("/view/?" + playlist.keyForLink() + '&' +
+#                                  Handler.warning("This playlist has no snippets to remove"))
+#
+#     def post(self):
+#         playlist = models.Playlist.getPlaylistFromRequest(self.request)
+#         if not playlist:
+#             return self.redirect("/?" + Handler.warning("Playlist not found"))
+#
+#         delSnippets = [int(v) for v in self.request.get_all('snippetIndex') if 0 <= int(v) < len(playlist.snippets)]
+#         playlist.snippets = [s for i, s in enumerate(playlist.snippets) if i not in delSnippets]
+#         playlist.put()
+#
+#         self.redirect("/view/?" + playlist.keyForLink())
+#
+#
+# class editHandler(PlaylistHandler):
+#     def getPlaylist(self, playlist):
+#         if playlist.snippets:
+#             self.render("editPlaylist.html", {'playlist': playlist})
+#         else:
+#             return self.redirect("/view/?" + playlist.keyForLink() + '&' +
+#                                  Handler.warning("This playlist has no snippets to edit"))
+#
+#     def post(self):
+#         playlist = models.Playlist.getPlaylistFromRequest(self.request)
+#         if not playlist:
+#             return self.redirect("/?" + Handler.warning("Playlist not found"))
+#         try:
+#             playlist.snippets = [models.Snippet(**{
+#                 k: int(self.request.get(key + '_' + k)) if isinstance(getattr(models.Snippet, k),
+#                                                                   ndb.IntegerProperty) else self.request.get(key + '_' + k)
+#                 for k in models.Snippet._properties}) for key in self.request.get_all('key')]
+#         except:
+#             print sys.exc_info()[0]
+#             self.redirect("/view/?" + playlist.keyForLink() + '&' + Handler.warning("There was a problem applying edits"))
+#
+#         req_fields = models.Snippet._properties.keys()
+#         req_fields.remove('notes')
+#
+#         if any(not v for v in [getattr(snpt, n) for snpt in playlist.snippets for n in req_fields]):
+#             return self.redirect("/view/?" + playlist.keyForLink() + '&' + Handler.warning("Required fields were missing"))
+#
+#         playlist.put()
+#         return self.redirect("/view/?" + playlist.keyForLink() + '&' + Handler.status("Edits applied to playlist"))
 
 
 # app = webapp2.WSGIApplication([
@@ -200,10 +269,3 @@ class editHandler(PlaylistHandler):
 #     ('/delsnippets/', delSnippetHandler),
 #     ('/edit/', editHandler)
 # ], debug=True)
-app = webapp2.WSGIApplication([
-    ('/', MainHandler),
-    ('/playlist/', PlaylistMain),
-    webapp2.Route('/playlist.json', allplaylistsJson),
-    webapp2.Route('/playlist/<Playlist>/', handler=PlaylistRoute),
-    webapp2.Route('/playlist/<Playlist>.json', handler=JSONGetter)
-], debug=True)

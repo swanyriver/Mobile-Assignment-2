@@ -1,0 +1,6 @@
+{% extends "view.html" %}
+{% import "playlist.html" as PlaylistTemplate %}
+{% block navTitle %} {{ snippet.title }} {% endblock %}
+{% block body %}
+    {{ PlaylistTemplate.snippet(snippet, false, 0) }}
+{% endblock body %}

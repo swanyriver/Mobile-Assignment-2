@@ -4,12 +4,12 @@
 {% block cssSource %} {{ PlaylistTemplate.playlistsStyle() }} {% endblock %}
 {% block navTitle %} {{ playlist.title }} by {{ playlist.creator }} {% endblock %}
 {% block navRight %}
-    {{ navRightButton(name="Delete Playlist", glyph="trash", link="/delete/?" + playlist.keyForLink(), theme="danger") }}
-    {% if playlist.snippets %}
-        {{ navRightButton(name="Remove Snippets", glyph="list", link="/delsnippets/?" + playlist.keyForLink(), theme="danger") }}
-        {{ navRightButton(name="Edit", glyph="pencil", link="/edit/?" + playlist.keyForLink(), theme="warning") }}
-    {% endif %}
-    {{ navRightButton(name="Add Snippet", glyph="plus", link="/add/?" + playlist.keyForLink(), theme="success") }}
+{#    {{ navRightButton(name="Delete Playlist", glyph="trash", link="/delete/?" + playlist.keyForLink(), theme="danger") }}#}
+{#    {% if playlist.snippets %}#}
+{#        {{ navRightButton(name="Remove Snippets", glyph="list", link="/delsnippets/?" + playlist.keyForLink(), theme="danger") }}#}
+{#        {{ navRightButton(name="Edit", glyph="pencil", link="/edit/?" + playlist.keyForLink(), theme="warning") }}#}
+{#    {% endif %}#}
+{#    {{ navRightButton(name="Add Snippet", glyph="plus", link="/add/?" + playlist.keyForLink(), theme="success") }}#}
 {% endblock %}
 
 {% block body %}
@@ -17,8 +17,8 @@
         {{ PlaylistTemplate.playlist(playlist, delete=delete) }}
     {% else %}
         There are currently no snippets in this playlist
-        <a href="/add/?{{ playlist.keyForLink() }}" type="button" class="btn btn-success">
-            <span class="glyphicon glyphicon-plus"></span> Add Snippet
-        </a>
+{#        <a href="/add/?{{ playlist.keyForLink() }}" type="button" class="btn btn-success">#}
+{#            <span class="glyphicon glyphicon-plus"></span> Add Snippet#}
+{#        </a>#}
     {% endif %}
 {% endblock body %}
