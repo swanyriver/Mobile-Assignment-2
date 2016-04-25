@@ -118,8 +118,8 @@ class PlaylistRoute(PlaylistHandler):
                    "snippet":snptKey.get()._to_dict()}
         return self.returnJSON(json.dumps(dictout), code=201)
 
-    def putPlaylist(self):
-        # todo move delete from list and reorder list to here
+    # def putPlaylist(self):
+    #     # todo move delete from list and reorder list to here
         pass
 
     def deletePlaylist(self, playlist):
@@ -127,8 +127,6 @@ class PlaylistRoute(PlaylistHandler):
             k.key.delete()
         playlist.key.delete()
         return self.returnJSON(None, code=202, message="playlist deleted")
-
-#todo subsume other handlers as verbs
 
 #for specific snippets
 class SnippetRoute(Handler):
@@ -142,10 +140,12 @@ class SnippetRoute(Handler):
         snpt = models.Snippet.getSnippetFromURL(kwargs)
         if not snpt:
             return self.returnJSON(None, code=404)
-        #plist = snpt.Parent.get()
-        #print plist
-        print snpt
-
+        plist = snpt.key.parent().get()
+        if snpt.key in plist.snippetKeys:
+            plist.snippetKeys.remove(snpt.key)
+            plist.put()
+        snpt.key.delete()
+        return self.returnJSON(None, code=202, message="Snippet deleted")
 
 app = webapp2.WSGIApplication([
     webapp2.Route('/', allplaylistsJson),

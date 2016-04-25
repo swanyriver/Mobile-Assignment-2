@@ -71,13 +71,13 @@ class PlaylistHandler(Handler):
         else:
             self.postPlaylist(playlist)
 
-    def put(self, **kwargs):
-        playlist = models.Playlist.getPlaylistFromURL(kwargs)
-
-        if not playlist:
-            return self.returnJSON(None, code=404)
-        else:
-            self.putPlaylist(playlist)
+    # def put(self, **kwargs):
+    #     playlist = models.Playlist.getPlaylistFromURL(kwargs)
+    #
+    #     if not playlist:
+    #         return self.returnJSON(None, code=404)
+    #     else:
+    #         self.putPlaylist(playlist)
 
     def delete(self, **kwargs):
         playlist = models.Playlist.getPlaylistFromURL(kwargs)
