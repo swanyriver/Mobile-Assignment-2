@@ -31,7 +31,7 @@ class MainHandler(Handler):
 class allplaylistsJson(Handler):
     def get(self):
         #todo create json of all playlists from models.Playlist.getAll()
-        self.returnJSON('this is where the json will be')
+        return self.returnJSON('this is where the json will be')
 
 
 # create playlist or return all playlists html
@@ -49,7 +49,7 @@ class PlaylistMain(Handler):
             if self.fromUI():
                 return self.redirect('/')
             else:
-                self.returnJSON(None, code=400)
+                return self.returnJSON(None, code=400)
         key = models.Playlist.createAndStore({k: v for k, v in self.request.POST.items() if v})
 
         if self.fromUI():
@@ -57,7 +57,7 @@ class PlaylistMain(Handler):
             return self.redirect(models.Playlist.keyForLinkFromKey(key))
 
         else:
-            self.returnJSON(json.dumps({'url':models.Playlist.keyForLinkFromKey(key),
+            return self.returnJSON(json.dumps({'url':models.Playlist.keyForLinkFromKey(key),
                                         'json':models.Playlist.jsonLinkfromKey(key)}), code=201)
 
 
@@ -66,6 +66,14 @@ class PlaylistMain(Handler):
         # todo move delete from list and reorder list to here
         pass
 
+
+class JSONGetter(Handler):
+    def get(self, **kwargs):
+        if models.Playlist.__name__ in kwargs:
+            plist = models.Playlist.getPlaylistFromURL(kwargs)
+            if not plist:
+                return self.returnJSON(None, code=404)
+            return self.returnJSON(plist.json())
 
 class PlaylistRoute(PlaylistHandler):
     def getPlaylist(self, playlist):
@@ -182,9 +190,6 @@ class editHandler(PlaylistHandler):
         playlist.put()
         return self.redirect("/view/?" + playlist.keyForLink() + '&' + Handler.status("Edits applied to playlist"))
 
-class testRoute(Handler):
-    def get(self, **kwargs):
-        self.response.write("%r"%kwargs)
 
 # app = webapp2.WSGIApplication([
 #     ('/', MainHandler),
@@ -200,5 +205,5 @@ app = webapp2.WSGIApplication([
     ('/playlist/', PlaylistMain),
     webapp2.Route('/playlist.json', allplaylistsJson),
     webapp2.Route('/playlist/<Playlist>/', handler=PlaylistRoute),
-    webapp2.Route('/test/<plist>/<ext>', handler=testRoute)
+    webapp2.Route('/playlist/<Playlist>.json', handler=JSONGetter)
 ], debug=True)

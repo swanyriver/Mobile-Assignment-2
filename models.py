@@ -1,5 +1,6 @@
 from google.appengine.ext import ndb
 import sys
+import json
 
 
 def getPopulateDictionary(model_class, request):
@@ -15,6 +16,15 @@ class Snippet(ndb.Model):
 
     # Used in debugging, GAE makes use of __str__ so toString is used by me
     #def toString(self): return str(self.__dict__)
+
+    def json(self):
+        dict = self.to_dict()
+        return json.dumps(dict)
+
+    def _to_dict(self):
+        dict = super(Snippet,self)._to_dict()
+        dict["Key"] = self.key.id()
+        return dict
 
 
 class Playlist(ndb.Model):
@@ -36,6 +46,14 @@ class Playlist(ndb.Model):
     # todo need to use URLs instead
     # def keyForForm(self):
     #     return "<input type=\"hidden\" name=\"%s\" value=\"%s\"></input>"%(Playlist.__name__, self.key.urlsafe())
+
+    def json(self):
+        dict = self.to_dict()
+        dict.pop('date_added')
+        dict['Key'] = self.key.id()
+        dict['snippetKeys'] = [k.id() for k in dict['snippetKeys']]
+        dict['snippets'] = [snp._to_dict() for snp in self.snippets]
+        return json.dumps(dict)
 
     @staticmethod
     def keyForLinkFromKey(key):
