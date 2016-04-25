@@ -145,7 +145,7 @@
 
 {% macro playlist_preview(p) -%}
     <div class="playlist_preview">
-        <a href="/view/?{{ p.keyForLink() }}">
+        <a href="{{ p.keyForLink() }}">
             <div class="panel panel-default playlist_preview_panel">
                 <div class="panel-heading">
                     <div class="panel-title pull-left">
