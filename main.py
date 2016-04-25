@@ -19,6 +19,11 @@ import credentials
 import json
 from google.appengine.api import urlfetch
 
+dumps = json.dumps
+def prettyJson(obj):
+    return dumps(obj, indent=2)
+json.dumps = prettyJson
+
 
 class MainHandler(Handler):
     def get(self):
@@ -29,7 +34,7 @@ class MainHandler(Handler):
 class allplaylistsJson(Handler):
     def get(self):
         return self.returnJSON(
-            [p._to_dict() for p in models.Playlist.query()]
+            json.dumps([p._to_dict() for p in models.Playlist.query()])
         )
 
 
@@ -100,19 +105,16 @@ class PlaylistRoute(PlaylistHandler):
             return self.returnJSON(None, code=400, message="Invalid YouTube VideoID")
 
         # create snippet
-        newSnippet = models.Snippet(**models.getPopulateDictionary(models.Snippet, self.request.POST.items()))
+        newSnippet = models.Snippet(parent=playlist.key, **models.getPopulateDictionary(models.Snippet, self.request.POST.items()))
         # todo validate that start/end times are 0 <= startTime < endTime <= videoLength,  youtube embedd fails gracefully for now
 
         # put in datastore, then add to playlist
-        newSnippet.parent= playlist
         snptKey = newSnippet.put()
         playlist.snippetKeys.append(snptKey)
         playlist.put()
 
         # return json with status
         dictout = {"result":"snippet created",
-                    "url":models.Snippet.keyForLinkFromKey(snptKey),
-                   "json":models.Snippet.jsonLinkfromKey(snptKey),
                    "snippet":snptKey.get()._to_dict()}
         return self.returnJSON(json.dumps(dictout), code=201)
 
@@ -146,6 +148,7 @@ class SnippetRoute(Handler):
 
 
 app = webapp2.WSGIApplication([
+    webapp2.Route('/', allplaylistsJson),
     webapp2.Route('/playlist.json', allplaylistsJson),
     webapp2.Route('/playlist/<Playlist>/', handler=PlaylistRoute),
     webapp2.Route('/playlist/<Playlist>.json', handler=JSONGetter),

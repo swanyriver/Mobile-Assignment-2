@@ -2,7 +2,6 @@ from google.appengine.ext import ndb
 import sys
 import json
 
-
 def getPopulateDictionary(model_class, request):
     return {k: int(v) if isinstance(getattr(model_class, k), ndb.IntegerProperty) else v for k, v in request if k in model_class._properties }
 
@@ -24,7 +23,37 @@ class Snippet(ndb.Model):
     def _to_dict(self):
         dict = super(Snippet,self)._to_dict()
         dict["Key"] = self.key.id()
+        dict["url"] = self.keyForLink()
+        dict["json"] = self.jsonLink()
         return dict
+
+    @staticmethod
+    def keyForLinkFromKey(key):
+        return "/snippet/%s/" % (key.urlsafe())
+
+    @staticmethod
+    def jsonLinkfromKey(key):
+        return "/snippet/%s.json" % (key.urlsafe())
+
+    def jsonLink(self):
+        return Snippet.jsonLinkfromKey(self.key)
+
+    def keyForLink(self):
+        return Snippet.keyForLinkFromKey(self.key)
+
+    @classmethod
+    def getSnippetFromURL(cls, kwargs):
+        if cls.__name__ not in kwargs: return None
+        try:
+            skey = ndb.Key(urlsafe=kwargs[cls.__name__])
+            print skey
+            snpt = skey.get()
+            print snpt
+        except:
+            print sys.exc_info()[0]
+            return None
+
+        return snpt
 
 
 class Playlist(ndb.Model):
@@ -46,6 +75,15 @@ class Playlist(ndb.Model):
     # todo need to use URLs instead
     # def keyForForm(self):
     #     return "<input type=\"hidden\" name=\"%s\" value=\"%s\"></input>"%(Playlist.__name__, self.key.urlsafe())
+
+    def _to_dict(self):
+        dict = super(Playlist, self)._to_dict()
+        dict.pop('date_added')
+        dict['Key'] = self.key.id()
+        dict['snippetKeys'] = [k.id() for k in dict['snippetKeys']]
+        dict['url'] = self.keyForLink()
+        dict['json'] = self.jsonLink()
+        return dict
 
     def json(self):
         dict = self.to_dict()
@@ -94,7 +132,7 @@ class Playlist(ndb.Model):
             return None
 
         # todo reconstruct selected thumbnail
-        plist.snippets = ndb.get_multi(plist.snippetKeys)
+        if plist: plist.snippets = ndb.get_multi(plist.snippetKeys)
         return plist
 
     # def getSnippetsFromPlaylist(self):

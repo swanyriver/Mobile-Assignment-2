@@ -51,7 +51,7 @@ class Handler(webapp2.RequestHandler):
     def returnJSON(self, jsonSt, code=200, message=None):
         self.response.set_status(code, message)
         self.response.headers['Content-Type'] = 'application/json'
-        self.response.out.write(jsonSt)
+        self.response.out.write(jsonSt or '{}')
 
 
 class PlaylistHandler(Handler):
@@ -59,30 +59,30 @@ class PlaylistHandler(Handler):
         playlist = models.Playlist.getPlaylistFromURL(kwargs)
 
         if not playlist:
-            return self.redirect("/?" + Handler.warning("Playlist not found"))
+            return self.returnJSON(None, code=404)
         else:
             self.getPlaylist(playlist)
 
-    def get(self, **kwargs):
+    def post(self, **kwargs):
         playlist = models.Playlist.getPlaylistFromURL(kwargs)
 
         if not playlist:
-            return self.redirect("/?" + Handler.warning("Playlist not found"))
+            return self.returnJSON(None, code=404)
         else:
-            self.getPlaylist(playlist)
+            self.postPlaylist(playlist)
 
-    def get(self, **kwargs):
+    def put(self, **kwargs):
         playlist = models.Playlist.getPlaylistFromURL(kwargs)
 
         if not playlist:
-            return self.redirect("/?" + Handler.warning("Playlist not found"))
+            return self.returnJSON(None, code=404)
         else:
-            self.getPlaylist(playlist)
+            self.putPlaylist(playlist)
 
-    def get(self, **kwargs):
+    def delete(self, **kwargs):
         playlist = models.Playlist.getPlaylistFromURL(kwargs)
 
         if not playlist:
-            return self.redirect("/?" + Handler.warning("Playlist not found"))
+            return self.returnJSON(None, code=404)
         else:
-            self.getPlaylist(playlist)
+            self.deletePlaylist(playlist)
