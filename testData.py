@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 import webapp2
+from google.appengine.api.modules.modules import set_num_instances
+
 import models
 from google.appengine.ext import ndb
 import handler
@@ -23,6 +25,7 @@ class MainHandler(handler.Handler):
         #for p in  models.Playlist.query(ancestor=pKey).fetch(): p.key.delete()
 
         for p in models.Playlist.query():
+            for snpt in p.snippetKeys: snpt.delete()
             p.key.delete()
 
 
@@ -95,10 +98,21 @@ class MainHandler(handler.Handler):
 
         for p, snpts in zip(playlists, snippets):
             k=p.put()
+            #p = k.get()
             for snp in snpts:
-                snp.parent = k
-                p.snippetKeys.append(snp.put())
+                snippet = models.Snippet(parent=k, **{k:getattr(snp,k) for k in ["title","videoID","startTime","endTime"]})
+                #snippet.populate()
+                p.snippetKeys.append(snippet.put())
             p.put()
+
+        print "-------my snippet--------------"
+        mySnippet=models.Snippet(parent=ndb.Key(models.Playlist, "parent"))
+        mySnippet.populate(**{k:getattr(snippets[0][0],k) for k in ["title","videoID","startTime","endTime"]})
+        print mySnippet
+        k = mySnippet.put()
+        snp = k.get()
+        print snp
+        print "------------------------------"
 
 
 
