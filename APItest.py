@@ -1,7 +1,7 @@
 from subprocess import check_output
 import json
 
-root = "http://swansonbassign3.appspot.com"
+root = "http://swansonbassign4.appspot.com"
 #root = "http://127.0.0.1:8080"
 
 snippets = [
