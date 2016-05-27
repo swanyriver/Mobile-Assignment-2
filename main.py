@@ -66,11 +66,11 @@ class PlaylistMain(Handler):
 
 class JSONGetter(Handler):
     def get(self, **kwargs):
-        if models.Snippet.__name__ in kwargs:
-            snpt = models.Snippet.getSnippetFromURL(kwargs)
-            if not snpt:
-                return self.returnJSON(None, code=404)
-            return self.returnJSON(snpt.json())
+        # if models.Snippet.__name__ in kwargs:
+        #     snpt = models.Snippet.getSnippetFromURL(kwargs)
+        #     if not snpt:
+        #         return self.returnJSON(None, code=404)
+        #     return self.returnJSON(snpt.json())
 
         if models.Playlist.__name__ in kwargs:
             plist = models.Playlist.getPlaylistFromURL(kwargs)
@@ -131,11 +131,11 @@ class PlaylistRoute(PlaylistHandler):
 
 #for specific snippets
 class SnippetRoute(Handler):
-    def get(self, **kwargs):
-        snpt = models.Snippet.getSnippetFromURL(kwargs)
-        if not snpt:
-            return self.returnJSON(None, code=404)
-        self.render("snippet.html", var={'snippet':snpt})
+    # def get(self, **kwargs):
+    #     snpt = models.Snippet.getSnippetFromURL(kwargs)
+    #     if not snpt:
+    #         return self.returnJSON(None, code=404)
+    #     self.render("snippet.html", var={'snippet':snpt})
 
     def put(self, **kwargs):
         snpt = models.Snippet.getSnippetFromURL(kwargs)
@@ -165,7 +165,7 @@ app = webapp2.WSGIApplication([
     webapp2.Route('/playlist/<Playlist>/', handler=PlaylistRoute),
     webapp2.Route('/playlist/<Playlist>.json', handler=JSONGetter),
     webapp2.Route('/snippet/<Snippet>/', handler=SnippetRoute),
-    webapp2.Route('/snippet/<Snippet>.json', handler=JSONGetter),
+    #webapp2.Route('/snippet/<Snippet>.json', handler=JSONGetter),
     ('/register', RegHandler),
     ("/login", LogHandler)
 ], debug=True)
