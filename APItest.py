@@ -134,14 +134,6 @@ def sendCurl(st, data=None, headers=None):
 
 #########SIGN UP USERS#########
 
-
-#######GET all current playlists#############
-print "Retrieving all existing playlists"
-res = check_output(["curl", "%s/playlist.json"%root])
-print res
-playlists = [p['url'] for p in json.loads(res)]
-print playlists
-
 ##create users###
 for u in users:
     res = sendCurl("-X POST %s%s"%(root, "/register"), data=u.name)
@@ -160,19 +152,33 @@ for u in users:
         u.tokenDir={"id":res["userid"], "token":res["token"]}
 
 
+#######GET all current playlists#############
+public_playlists = sendCurl(root + "/playlist.json")
+print "PUBLIC PLAYLISTS"
+print public_playlists
+
+# #get users playlists and delete them
+for u in users:
+    plst = sendCurl(root + "/playlist.json", headers=u.tokenDir)
+    print plst
+    plst = json.loads(plst)
+
+    for p in plst:
+        print sendCurl("-X DELETE %s%s" % (root, p['url']), headers=u.tokenDir)
+
+    print "Expected no more playlist for user"
+    print sendCurl(root + "/playlist.json", headers=u.tokenDir)
+
 #create playlists
 for u in users:
     for p,snpts in u.playlists:
         res = sendCurl("-X POST %s"%root, data=p, headers=u.tokenDir)
         print res
         p.update(json.loads(res))
-        #res = json.loads(res)
-        # purl = res['url']
-        # pjson = res['json']
 
-
-        # for s in snpts:
-        #     res = sendCurl("-X POST %s%s" % (root, purl), data=s)
+        for s in snpts:
+            res = sendCurl("-X POST %s%s" % (root, p['url']), data=s, headers=u.tokenDir)
+            print res
 
         #check playlist  #far too verbose
         # print "Retrieveing %s playlist <%s> without auth"%("PUBLIC" if "public" in p else "", p["title"])
@@ -194,11 +200,10 @@ print public_playlists
 check_output('google-chrome ' + root, shell=True)
 
 
-
 #test public/private GET of playlist HTML/JSON
 print "JACKS PlAYLISTS"
 print sendCurl(root + "/playlist.json", headers=jack.tokenDir)
-for p,snpts in jack.playlists:
+for p, snpts in jack.playlists:
     check_output('google-chrome ' + root + p['url'], shell=True)
     if "public" in p:
         print "retrieve public playlist json without auth"
