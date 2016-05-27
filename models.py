@@ -65,22 +65,11 @@ class Snippet(ndb.Model):
 class Playlist(ndb.Model):
     AnonymousParent = ndb.Key('Playlist', "Anonymous")
 
+    #todo add isPublic bool property
     title = ndb.StringProperty(indexed=False, required=True)
     creator = ndb.StringProperty(indexed=False, required=True, default="Anonymous")
     snippetKeys = ndb.KeyProperty(kind=Snippet, repeated=True, indexed=False)
     date_added = ndb.DateTimeProperty(auto_now_add=True)
-
-
-    # Used in debugging, GAE makes use of __str__ so toString is used by me
-    # def toString(self):
-    #     st = str(self.title)
-    #     st += str(self.creator)
-    #     for snip in self.snippets: st += snip.toString() + '\n'
-    #     return st
-
-    # todo need to use URLs instead
-    # def keyForForm(self):
-    #     return "<input type=\"hidden\" name=\"%s\" value=\"%s\"></input>"%(Playlist.__name__, self.key.urlsafe())
 
     def _to_dict(self):
         dict = super(Playlist, self)._to_dict()
@@ -116,10 +105,14 @@ class Playlist(ndb.Model):
     @staticmethod
     def getAll(ancestor=None):
         if ancestor:
+            #todo This has definitly not been tested!
+            #todo need to get just the users playlists (should i authenticate here?)
             pkey = ndb.Key(Playlist, ancestor)
             pquery = Playlist.query(ancestor=pkey).order(-Playlist.date_added)
             return pquery.fetch()
         else:
+            #todo only return public playlists
+            #todo make seperate method
             plists = Playlist.query()
             for p in plists: p.snippets = ndb.get_multi(p.snippetKeys)
             return plists

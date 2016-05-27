@@ -18,6 +18,7 @@ import models
 import credentials
 import json
 from google.appengine.api import urlfetch
+from user import LogHandler, RegHandler, validate_user
 
 dumps = json.dumps
 def prettyJson(obj):
@@ -30,6 +31,7 @@ class MainHandler(Handler):
         self.render("main.html", var={'playlists': models.Playlist.getAll()})
 
 
+#todo need public playlists and user playlists
 # return json of all playlists
 class allplaylistsJson(Handler):
     def get(self):
@@ -163,5 +165,7 @@ app = webapp2.WSGIApplication([
     webapp2.Route('/playlist/<Playlist>/', handler=PlaylistRoute),
     webapp2.Route('/playlist/<Playlist>.json', handler=JSONGetter),
     webapp2.Route('/snippet/<Snippet>/', handler=SnippetRoute),
-    webapp2.Route('/snippet/<Snippet>.json', handler=JSONGetter)
+    webapp2.Route('/snippet/<Snippet>.json', handler=JSONGetter),
+    ('/register', RegHandler),
+    ("/login", LogHandler)
 ], debug=True)
