@@ -98,10 +98,6 @@ testPlaylists = [
     {"title": "OSU Tour"}
 ]
 
-# users = [
-#     {"name":"Brandon", "password":"bpass", "playlists": testPlaylists[:2]},
-#     {"name":"JackABoy", "password":"jpass", "playlists": testPlaylists[2:]}
-# ]
 class user:
     def __init__(self):
         pass
@@ -250,37 +246,3 @@ print sendCurl("-X PUT %s%s" % (root, snpturl), headers=jack.tokenDir, data=data
 
 print sendCurl("%s%s" % (root, p['json']), headers=jack.tokenDir)
 check_output('google-chrome ' + root + p['url'], shell=True)
-
-
-
-# print "Deleting all existing playlists and snippets"
-#
-# for p in playlists:
-#     #res = check_output(["curl", "-X DELETE \"%s%s\""%(root,p)])
-#     res = sendCurl("-X DELETE %s%s" % (root, p))
-#     print res
-
-# print "checking that all existing playlists were deleted"
-# res = check_output(["curl", "%s/playlist.json"%root])
-# print res
-#
-# print "Creating Test data"
-# print "create 3 playlists and after creating each one create and associate snippets"
-# for p,snps in zip(testPlaylists, snippets):
-#     print p,snps
-#     res = sendCurl("-X POST %s"%root, data=p)
-#     print res
-#     res = json.loads(res)
-#     purl = res['url']
-#     print "adding snippets"
-#     for s in snps:
-#         res = sendCurl("-X POST %s%s"%(root,purl), data=s)
-#         print res
-#
-#
-# print "Retrieving all existing playlists"
-# res = check_output(["curl", "%s/playlist.json"%root])
-# print res
-# playlist = [p['json'] for p in json.loads(res)][0]
-
-
