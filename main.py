@@ -26,13 +26,7 @@ def prettyJson(obj):
 json.dumps = prettyJson
 
 
-#todo change to public playlist only
-class MainHandler(Handler):
-    def get(self):
-        self.render("main.html", var={'playlists': models.Playlist.getAll()})
-
-
-# return json of all playlists
+# return json of all playlists #/playlist.json
 class allplaylistsJson(Handler):
     def get(self):
         # todo there is a problem here, this is a get method, there are no post paramaters
@@ -47,13 +41,16 @@ class allplaylistsJson(Handler):
             )
 
 
-# create playlist or return all playlists html
+# create playlist or return all playlists html # / , /playlist/
 class PlaylistMain(Handler):
     def get(self):
         self.render("main.html", var={'playlists': models.Playlist.getAll()})
 
     #create playlists
     def post(self):
+        user = validate_user(self.request)
+        if not user:
+            return self.returnJSON({"msg": "User Validation Failed"}, code=400)
 
         # create playlist from post request
         if 'title' not in self.request.POST or not self.request.POST['title']:
@@ -63,7 +60,7 @@ class PlaylistMain(Handler):
         return self.returnJSON(json.dumps({'url':models.Playlist.keyForLinkFromKey(key),
                                     'json':models.Playlist.jsonLinkfromKey(key)}), code=201)
 
-
+#/playlist/<Playlist>.json
 class JSONGetter(Handler):
     def get(self, **kwargs):
         if models.Playlist.__name__ in kwargs:
@@ -128,7 +125,7 @@ class PlaylistRoute(PlaylistHandler):
         playlist.key.delete()
         return self.returnJSON(None, code=202, message="playlist deleted")
 
-#for specific snippets
+#for specific snippets #/snippet/<Snippet>/
 class SnippetRoute(Handler):
     # def get(self, **kwargs):
     #     snpt = models.Snippet.getSnippetFromURL(kwargs)
