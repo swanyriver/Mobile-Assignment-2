@@ -3,7 +3,7 @@ import jinja2
 import os
 import urllib
 import models
-
+from user import validate_user
 
 class Handler(webapp2.RequestHandler):
     WARNING="warning"
@@ -52,34 +52,39 @@ class Handler(webapp2.RequestHandler):
 
 
 class PlaylistHandler(Handler):
+    #authenticate here??
     def get(self, **kwargs):
         playlist = models.Playlist.getPlaylistFromURL(kwargs)
-
         if not playlist:
             return self.returnJSON(None, code=404)
-        else:
-            self.getPlaylist(playlist)
+
+        user = validate_user(self.request)
+        if not user or user.key != playlist.key.parent():
+            return self.returnJSON({"msg": "User Validation Failed"}, code=400)
+
+        self.getPlaylist(playlist)
 
     def post(self, **kwargs):
         playlist = models.Playlist.getPlaylistFromURL(kwargs)
 
         if not playlist:
             return self.returnJSON(None, code=404)
-        else:
-            self.postPlaylist(playlist)
 
-    # def put(self, **kwargs):
-    #     playlist = models.Playlist.getPlaylistFromURL(kwargs)
-    #
-    #     if not playlist:
-    #         return self.returnJSON(None, code=404)
-    #     else:
-    #         self.putPlaylist(playlist)
+        user = validate_user(self.request)
+        if not user or user.key != playlist.key.parent():
+            return self.returnJSON({"msg": "User Validation Failed"}, code=400)
+
+        self.postPlaylist(playlist)
+
 
     def delete(self, **kwargs):
         playlist = models.Playlist.getPlaylistFromURL(kwargs)
 
         if not playlist:
             return self.returnJSON(None, code=404)
-        else:
-            self.deletePlaylist(playlist)
+
+        user = validate_user(self.request)
+        if not user or user.key != playlist.key.parent():
+            return self.returnJSON({"msg": "User Validation Failed"}, code=400)
+
+        self.deletePlaylist(playlist)
