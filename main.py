@@ -130,6 +130,8 @@ class PlaylistRoute(PlaylistHandler):
 
 #for specific snippets #/snippet/<Snippet>/
 class SnippetRoute(Handler):
+
+    ## Currently not supported, no endpoints for displaying a single snippet ##
     # def get(self, **kwargs):
     #     snpt = models.Snippet.getSnippetFromURL(kwargs)
     #     if not snpt:
@@ -140,6 +142,12 @@ class SnippetRoute(Handler):
         snpt = models.Snippet.getSnippetFromURL(kwargs)
         if not snpt:
             return self.returnJSON(None, code=404)
+
+        print "SNPT PARENT >>> ", snpt.key.parent().parent()
+        user = validate_user(self.request)
+        if not user or user.key != snpt.key.parent().parent():
+            return self.returnJSON({"msg": "User Validation Failed"}, code=401)
+
         #update record
         snpt.populate(**models.getPopulateDictionary(models.Snippet, self.request.POST.items()))
         snpt.put()
@@ -151,6 +159,11 @@ class SnippetRoute(Handler):
         if not snpt:
             return self.returnJSON(None, code=404)
         plist = snpt.key.parent().get()
+
+        user = validate_user(self.request)
+        if not user or user.key != plist.key.parent():
+            return self.returnJSON({"msg": "User Validation Failed"}, code=401)
+
         if snpt.key in plist.snippetKeys:
             plist.snippetKeys.remove(snpt.key)
             plist.put()

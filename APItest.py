@@ -169,6 +169,9 @@ for u in users:
     print "Expected no more playlist for user"
     print sendCurl(root + "/playlist.json", headers=u.tokenDir)
 
+print "Expected no more public playlists"
+print sendCurl(root + "/playlist.json")
+
 #create playlists
 for u in users:
     for p,snpts in u.playlists:
@@ -219,8 +222,34 @@ for p, snpts in jack.playlists:
         print sendCurl("%s%s" % (root, p['json']), headers=jack.tokenDir)
 
 
+#test put and delete for snippet
+p = jack.playlists[1][0]
+playlist = json.loads(sendCurl("%s%s" % (root, p['json']), headers=jack.tokenDir))
+#delete jacktruck clip
+snpturl = playlist['snippets'][1]['url']
+#unauth
+print sendCurl("-X DELETE %s%s" % (root, snpturl))
+#wrongAuth
+print sendCurl("-X DELETE %s%s" % (root, snpturl), headers=brandon.tokenDir)
+#correctAuth
+print sendCurl("-X DELETE %s%s" % (root, snpturl), headers=jack.tokenDir)
+#snippet doesnt exist
+print sendCurl("-X DELETE %s%s" % (root, snpturl), headers=jack.tokenDir)
 
+#modify last clip
+snpturl = playlist['snippets'][-1]['url']
+#unauth
+data = {"title":"Updated Title", "startTime":"870", "notes": "Updated noetes"}
+print sendCurl("-X PUT %s%s" % (root, snpturl), data=data)
+#wrongAuth
+print sendCurl("-X PUT %s%s" % (root, snpturl), headers=brandon.tokenDir, data=data)
+#correctAuth
+print sendCurl("-X PUT %s%s" % (root, snpturl), headers=jack.tokenDir, data=data)
+#snippet doesnt exist
+print sendCurl("-X PUT %s%s" % (root, snpturl), headers=jack.tokenDir, data=data)
 
+print sendCurl("%s%s" % (root, p['json']), headers=jack.tokenDir)
+check_output('google-chrome ' + root + p['url'], shell=True)
 
 
 
