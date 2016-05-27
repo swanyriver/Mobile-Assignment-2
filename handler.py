@@ -58,11 +58,12 @@ class PlaylistHandler(Handler):
             return self.returnJSON(None, code=404)
 
         if playlist.isPublic:
-            self.getPlaylist(playlist)
+            return self.getPlaylist(playlist)
 
         user = validate_user(self.request)
         if not user or user.key != playlist.key.parent():
             self.response.set_status(401)
+            self.response.write("<h1>Unauthorized Access</h1>")
             return
 
         self.getPlaylist(playlist)
