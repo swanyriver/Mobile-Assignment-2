@@ -102,7 +102,7 @@ class Playlist(ndb.Model):
 
     #for html representation
     @staticmethod
-    def getAll():
+    def getAllPublicsForHTML():
         plists = Playlist.query(Playlist.isPublic == True)
         for p in plists: p.snippets = ndb.get_multi(p.snippetKeys)
         return plists
@@ -129,9 +129,6 @@ class Playlist(ndb.Model):
 
     @staticmethod
     def createAndStore(kv, user):
-        # newPlaylist = Playlist(parent=ndb.Key(Playlist, kv['creator'] if 'creator' in kv else Playlist.AnonymousParent))
-        # newPlaylist.populate(**kv)
-        #k = ndb.Key(user.key)
         newPlaylist = Playlist(parent = user.key)
         newPlaylist.creator = user.auth_ids[0]
         newPlaylist.title = kv['title']

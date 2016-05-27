@@ -108,11 +108,11 @@ class user:
 
 jack = user()
 jack.name = {"name":"JackABoy", "password":"jpass"}
-jack.playlists = zip(testPlaylists[2:], snippets[2:])
+jack.playlists = zip(testPlaylists[:2], snippets[:2])
 
 brandon = user()
 brandon.name = {"name":"Brandon", "password":"bpass"}
-brandon.playlists = zip(testPlaylists[:2], snippets[2:])
+brandon.playlists = zip(testPlaylists[2:], snippets[2:])
 users = [jack, brandon]
 
 def sendCurl(st, data=None, headers=None):
@@ -130,7 +130,7 @@ def sendCurl(st, data=None, headers=None):
 
     args = ["curl"] + headArray + data + st.split(' ')
     print "SENDING CURL CALL: ", " ".join(args)
-    return  check_output(' '.join(args), shell=True)
+    return check_output(' '.join(args), shell=True)
 
 #########SIGN UP USERS#########
 
@@ -159,20 +159,63 @@ for u in users:
             exit()
         u.tokenDir={"id":res["userid"], "token":res["token"]}
 
-    #check their playlists
-    #res = sendCurl()
-
 
 #create playlists
 for u in users:
     for p,snpts in u.playlists:
         res = sendCurl("-X POST %s"%root, data=p, headers=u.tokenDir)
         print res
-        res = json.loads(res)
+        p.update(json.loads(res))
+        #res = json.loads(res)
         # purl = res['url']
-        #
+        # pjson = res['json']
+
+
         # for s in snpts:
         #     res = sendCurl("-X POST %s%s" % (root, purl), data=s)
+
+        #check playlist  #far too verbose
+        # print "Retrieveing %s playlist <%s> without auth"%("PUBLIC" if "public" in p else "", p["title"])
+        # res = sendCurl("%s%s"%(root, pjson))
+        # print res
+        # # res = sendCurl("%s%s"%(root,purl))
+        # # print res
+        #
+        # print "Retrieveing %s playlist <%s> with auth" % ("PUBLIC" if "public" in p else "", p["title"])
+        # res = sendCurl("%s%s" % (root, pjson), headers=u.tokenDir)
+        # print res
+        # # res = sendCurl("%s%s" % (root, purl), headers=u.tokenDir)
+        # # print res
+
+#check public playlists
+public_playlists = sendCurl(root + "/playlist.json")
+print "PUBLIC PLAYLISTS"
+print public_playlists
+check_output('google-chrome ' + root, shell=True)
+
+
+
+#test public/private GET of playlist HTML/JSON
+print "JACKS PlAYLISTS"
+print sendCurl(root + "/playlist.json", headers=jack.tokenDir)
+for p,snpts in jack.playlists:
+    check_output('google-chrome ' + root + p['url'], shell=True)
+    if "public" in p:
+        print "retrieve public playlist json without auth"
+        print sendCurl("%s%s"%(root, p['json']))
+    else:
+        print "retrieve PRIVATE playlist json without auth"
+        print sendCurl("%s%s" % (root, p['json']))
+
+        print "retrieve PRIVATE playlist json with wrong auth"
+        print sendCurl("%s%s" % (root, p['json']), headers=brandon.tokenDir)
+
+        print "retrieve PRIVATE playlist json with auth"
+        print sendCurl("%s%s" % (root, p['json']), headers=jack.tokenDir)
+
+
+
+
 
 
 

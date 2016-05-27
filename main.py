@@ -27,9 +27,9 @@ json.dumps = prettyJson
 
 
 # return json of all playlists #/playlist.json
+# public playlist or user playlists switched by presence of headers
 class allplaylistsJson(Handler):
     def get(self):
-        # todo there is a problem here, this is a get method, there are no post paramaters
         user = validate_user(self.request)
         if user:
             return self.returnJSON(
@@ -44,13 +44,13 @@ class allplaylistsJson(Handler):
 # create playlist or return all playlists html # / , /playlist/
 class PlaylistMain(Handler):
     def get(self):
-        self.render("main.html", var={'playlists': models.Playlist.getAll()})
+        self.render("main.html", var={'playlists': models.Playlist.getAllPublicsForHTML()})
 
     #create playlists
     def post(self):
         user = validate_user(self.request)
         if not user:
-            return self.returnJSON({"msg": "User Validation Failed"}, code=400)
+            return self.returnJSON({"msg": "User Validation Failed"}, code=401)
 
         # create playlist from post request
         if 'title' not in self.request.POST or not self.request.POST['title']:
@@ -65,14 +65,17 @@ class JSONGetter(Handler):
     def get(self, **kwargs):
         if models.Playlist.__name__ in kwargs:
 
-            # user = validate_user(self.request)
-            # if not user:
-            #     return self.returnJSON({"msg": "User Validation Failed"}, code=400)
-
             plist = models.Playlist.getPlaylistFromURL(kwargs)
             if not plist:
                 return self.returnJSON(None, code=404)
-            return self.returnJSON(plist.json())
+            if plist.isPublic:
+                return self.returnJSON(plist.json())
+            else:
+                user = validate_user(self.request)
+                if not user or user.key != plist.key.parent():
+                    return self.returnJSON({"msg": "User Validation Failed"}, code=401)
+                else:
+                    return self.returnJSON(plist.json())
 
 
 

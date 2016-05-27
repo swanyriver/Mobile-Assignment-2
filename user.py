@@ -61,11 +61,11 @@ class LogHandler(webapp2.RequestHandler):
             user = auth.get_auth().store.user_model.get_by_auth_password(name, passw)
         except auth.InvalidPasswordError:
             jsonMsg(self.response, "Invalid Password")
-            self.response.set_status(400)
+            self.response.set_status(401)
             return
         except auth.InvalidAuthIdError:
             jsonMsg(self.response, "User Does Not Exist")
-            self.response.set_status(400)
+            self.response.set_status(401)
             return
 
         if not user:

@@ -52,15 +52,18 @@ class Handler(webapp2.RequestHandler):
 
 
 class PlaylistHandler(Handler):
-    #authenticate here??
     def get(self, **kwargs):
         playlist = models.Playlist.getPlaylistFromURL(kwargs)
         if not playlist:
             return self.returnJSON(None, code=404)
 
+        if playlist.isPublic:
+            self.getPlaylist(playlist)
+
         user = validate_user(self.request)
         if not user or user.key != playlist.key.parent():
-            return self.returnJSON({"msg": "User Validation Failed"}, code=400)
+            self.response.set_status(401)
+            return
 
         self.getPlaylist(playlist)
 
@@ -72,7 +75,7 @@ class PlaylistHandler(Handler):
 
         user = validate_user(self.request)
         if not user or user.key != playlist.key.parent():
-            return self.returnJSON({"msg": "User Validation Failed"}, code=400)
+            return self.returnJSON({"msg": "User Validation Failed"}, code=401)
 
         self.postPlaylist(playlist)
 
@@ -85,6 +88,6 @@ class PlaylistHandler(Handler):
 
         user = validate_user(self.request)
         if not user or user.key != playlist.key.parent():
-            return self.returnJSON({"msg": "User Validation Failed"}, code=400)
+            return self.returnJSON({"msg": "User Validation Failed"}, code=401)
 
         self.deletePlaylist(playlist)
