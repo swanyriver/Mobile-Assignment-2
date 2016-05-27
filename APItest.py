@@ -1,9 +1,9 @@
 from subprocess import check_output
 import json
 
-root = "http://swansonbfinalproject.appspot.com"
+#root = "http://swansonbfinalproject.appspot.com"
 #root = "http://swansonbassign4.appspot.com"
-#root = "http://127.0.0.1:8080"
+root = "http://127.0.0.1:8080"
 
 snippets = [
     [
@@ -89,12 +89,31 @@ snippets = [
     ]
 
 ]
+
+
 testPlaylists = [
-    {"title":"Lookouts", "creator":"a@mail.com"},
-    {"title": "Super Truck"},
-    {"title": "Computerphile", "creator": "a@mail.com"},
+    {"title":"Lookouts"},
+    {"title": "Super Truck", "public":None},
+    {"title": "Computerphile", "public":None},
     {"title": "OSU Tour"}
 ]
+
+# users = [
+#     {"name":"Brandon", "password":"bpass", "playlists": testPlaylists[:2]},
+#     {"name":"JackABoy", "password":"jpass", "playlists": testPlaylists[2:]}
+# ]
+class user:
+    def __init__(self):
+        pass
+
+jack = user()
+jack.name = {"name":"JackABoy", "password":"jpass"}
+jack.playlists = testPlaylists[2:]
+
+brandon = user()
+brandon.name = {"name":"Brandon", "password":"bpass"}
+brandon.playlists = testPlaylists[:2]
+users = [jack, brandon]
 
 def sendCurl(st, data=None):
 
@@ -107,39 +126,74 @@ def sendCurl(st, data=None):
     print "SENDING CURL CALL: ", " ".join(args)
     return  check_output(' '.join(args), shell=True)
 
+#########SIGN UP USERS#########
+
+
 #######GET all current playlists#############
 print "Retrieving all existing playlists"
 res = check_output(["curl", "%s/playlist.json"%root])
 print res
 playlists = [p['url'] for p in json.loads(res)]
-print "Deleting all existing playlists and snippets"
 
-for p in playlists:
-    #res = check_output(["curl", "-X DELETE \"%s%s\""%(root,p)])
-    res = sendCurl("-X DELETE %s%s" % (root, p))
-    print res
-
-print "checking that all existing playlists were deleted"
-res = check_output(["curl", "%s/playlist.json"%root])
-print res
-
-print "Creating Test data"
-print "create 3 playlists and after creating each one create and associate snippets"
-for p,snps in zip(testPlaylists, snippets):
-    print p,snps
-    res = sendCurl("-X POST %s"%root, data=p)
+##create users###
+for u in users:
+    res = sendCurl("-X POST %s%s"%(root, "/register"), data=u.name)
     print res
     res = json.loads(res)
-    purl = res['url']
-    print "adding snippets"
-    for s in snps:
-        res = sendCurl("-X POST %s%s"%(root,purl), data=s)
+    #print res.has_key("token") or in works
+    if "token" in res and "userid" in res:
+        u.tokenDir={"id":res["userid"], "token":res["token"]}
+    else:
+        res = sendCurl("-X POST %s%s" % (root, "/login"), data=u.name)
         print res
+        res = json.loads(res)
+        if "token" not in res or "userid" not in res:
+            print "CRITICAL FAILURE, user not able to reg or log in"
+            exit()
+        u.tokenDir={"id":res["userid"], "token":res["token"]}
+
+    #check their playlists
+    res = sendCurl()
 
 
-print "Retrieving all existing playlists"
-res = check_output(["curl", "%s/playlist.json"%root])
-print res
-playlist = [p['json'] for p in json.loads(res)][0]
+
+for u in users:
+    for p in u.playlists:
+        p.update(u.tokenDir)
+        res = sendCurl("-X POST %s"%root, data=p)
+        print res
+        res = json.loads(res)
+
+
+
+# print "Deleting all existing playlists and snippets"
+#
+# for p in playlists:
+#     #res = check_output(["curl", "-X DELETE \"%s%s\""%(root,p)])
+#     res = sendCurl("-X DELETE %s%s" % (root, p))
+#     print res
+
+# print "checking that all existing playlists were deleted"
+# res = check_output(["curl", "%s/playlist.json"%root])
+# print res
+#
+# print "Creating Test data"
+# print "create 3 playlists and after creating each one create and associate snippets"
+# for p,snps in zip(testPlaylists, snippets):
+#     print p,snps
+#     res = sendCurl("-X POST %s"%root, data=p)
+#     print res
+#     res = json.loads(res)
+#     purl = res['url']
+#     print "adding snippets"
+#     for s in snps:
+#         res = sendCurl("-X POST %s%s"%(root,purl), data=s)
+#         print res
+#
+#
+# print "Retrieving all existing playlists"
+# res = check_output(["curl", "%s/playlist.json"%root])
+# print res
+# playlist = [p['json'] for p in json.loads(res)][0]
 
 

@@ -31,9 +31,6 @@ class Handler(webapp2.RequestHandler):
     def status(text):
         return "%s=%s"%(Handler.STATUS, urllib.quote(text))
 
-    def fromUI(self):
-        return 'fromUI' in self.request.params
-
     def getReqVal(self, k):
         val = self.request.get(k)
         if val is None: return None

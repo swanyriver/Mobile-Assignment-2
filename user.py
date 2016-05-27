@@ -4,7 +4,7 @@ import json
 
 
 def jsonMsg(response,msg):
-    response.write(json.dumps({"msg": msg}, indent=2) + '\n')
+    response.write(json.dumps({"msg": msg}) + '\n')
 
 
 class RegHandler(webapp2.RequestHandler):
@@ -35,10 +35,9 @@ class RegHandler(webapp2.RequestHandler):
         else:
             print user
             self.response.write(
-                json.dumps({"msg": "User Logged In",
+                json.dumps({"msg": "User Created",
                             'userid': user.key.id(),
-                            'token': user.create_auth_token(user.key.id())},
-                           indent=2
+                            'token': user.create_auth_token(user.key.id())}
                            ))
             self.response.set_status(200)
             return
@@ -79,8 +78,7 @@ class LogHandler(webapp2.RequestHandler):
             self.response.write(
                 json.dumps({"msg": "User Logged In",
                             'userid': user.key.id(),
-                            'token': user.create_auth_token(user.key.id())},
-                           indent=2
+                            'token': user.create_auth_token(user.key.id())}
                            ))
             self.response.set_status(200)
             return

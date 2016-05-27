@@ -26,18 +26,25 @@ def prettyJson(obj):
 json.dumps = prettyJson
 
 
+#todo change to public playlist only
 class MainHandler(Handler):
     def get(self):
         self.render("main.html", var={'playlists': models.Playlist.getAll()})
 
 
-#todo need public playlists and user playlists
 # return json of all playlists
 class allplaylistsJson(Handler):
     def get(self):
-        return self.returnJSON(
-            json.dumps([p._to_dict() for p in models.Playlist.query()])
-        )
+        # todo there is a problem here, this is a get method, there are no post paramaters
+        user = validate_user(self.request)
+        if user:
+            return self.returnJSON(
+                json.dumps(models.Playlist.get_users_playlists(user))
+            )
+        else:
+            return self.returnJSON(
+                json.dumps(models.Playlist.get_public_playlists())
+            )
 
 
 # create playlist or return all playlists html
@@ -47,32 +54,24 @@ class PlaylistMain(Handler):
 
     #create playlists
     def post(self):
+
         # create playlist from post request
-        if 'title' not in self.request.POST:
-            if self.fromUI():
-                return self.redirect('/')
-            else:
-                return self.returnJSON(None, code=400)
-        key = models.Playlist.createAndStore({k: v for k, v in self.request.POST.items() if v})
+        if 'title' not in self.request.POST or not self.request.POST['title']:
+            return self.returnJSON(None, code=400)
+        key = models.Playlist.createAndStore(self.request.POST, user)
 
-        if self.fromUI():
-            # redirect to add snippet
-            return self.redirect(models.Playlist.keyForLinkFromKey(key))
-
-        else:
-            return self.returnJSON(json.dumps({'url':models.Playlist.keyForLinkFromKey(key),
-                                        'json':models.Playlist.jsonLinkfromKey(key)}), code=201)
+        return self.returnJSON(json.dumps({'url':models.Playlist.keyForLinkFromKey(key),
+                                    'json':models.Playlist.jsonLinkfromKey(key)}), code=201)
 
 
 class JSONGetter(Handler):
     def get(self, **kwargs):
-        # if models.Snippet.__name__ in kwargs:
-        #     snpt = models.Snippet.getSnippetFromURL(kwargs)
-        #     if not snpt:
-        #         return self.returnJSON(None, code=404)
-        #     return self.returnJSON(snpt.json())
-
         if models.Playlist.__name__ in kwargs:
+
+            # user = validate_user(self.request)
+            # if not user:
+            #     return self.returnJSON({"msg": "User Validation Failed"}, code=400)
+
             plist = models.Playlist.getPlaylistFromURL(kwargs)
             if not plist:
                 return self.returnJSON(None, code=404)

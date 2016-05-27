@@ -63,11 +63,9 @@ class Snippet(ndb.Model):
 
 
 class Playlist(ndb.Model):
-    AnonymousParent = ndb.Key('Playlist', "Anonymous")
-
-    #todo add isPublic bool property
+    isPublic = ndb.BooleanProperty(indexed=True, required=True, default=False)
     title = ndb.StringProperty(indexed=False, required=True)
-    creator = ndb.StringProperty(indexed=False, required=True, default="Anonymous")
+    creator = ndb.StringProperty(indexed=False, required=True)
     snippetKeys = ndb.KeyProperty(kind=Snippet, repeated=True, indexed=False)
     date_added = ndb.DateTimeProperty(auto_now_add=True)
 
@@ -102,20 +100,12 @@ class Playlist(ndb.Model):
     def keyForLink(self):
         return Playlist.keyForLinkFromKey(self.key)
 
+    #for html representation
     @staticmethod
-    def getAll(ancestor=None):
-        if ancestor:
-            #todo This has definitly not been tested!
-            #todo need to get just the users playlists (should i authenticate here?)
-            pkey = ndb.Key(Playlist, ancestor)
-            pquery = Playlist.query(ancestor=pkey).order(-Playlist.date_added)
-            return pquery.fetch()
-        else:
-            #todo only return public playlists
-            #todo make seperate method
-            plists = Playlist.query()
-            for p in plists: p.snippets = ndb.get_multi(p.snippetKeys)
-            return plists
+    def getAll():
+        plists = Playlist.query(Playlist.isPublic == True)
+        for p in plists: p.snippets = ndb.get_multi(p.snippetKeys)
+        return plists
 
 
     @classmethod
@@ -138,13 +128,23 @@ class Playlist(ndb.Model):
     #     return ndb.get_multi(self.snippetKeys)
 
     @staticmethod
-    def createAndStore(kv):
+    def createAndStore(kv, user):
         # newPlaylist = Playlist(parent=ndb.Key(Playlist, kv['creator'] if 'creator' in kv else Playlist.AnonymousParent))
         # newPlaylist.populate(**kv)
-        k = ndb.Key(Playlist, kv['creator']) if 'creator' in kv else Playlist.AnonymousParent
-        newPlaylist = Playlist(parent = k)
-        if 'creator' in kv: newPlaylist.creator = kv['creator']
+        #k = ndb.Key(user.key)
+        newPlaylist = Playlist(parent = user.key)
+        newPlaylist.creator = user.auth_ids[0]
         newPlaylist.title = kv['title']
+        newPlaylist.isPublic = "public" in kv
+        print newPlaylist
 
         return newPlaylist.put()
+
+    @classmethod
+    def get_public_playlists(cls):
+        return [p._to_dict() for p in cls.query(Playlist.isPublic == True)]
+
+    @classmethod
+    def get_users_playlists(cls, user):
+        return [p._to_dict() for p in cls.query(ancestor=user.key)]
 
