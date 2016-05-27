@@ -1,7 +1,8 @@
 from subprocess import check_output
 import json
 
-root = "http://swansonbassign4.appspot.com"
+root = "http://swansonbfinalproject.appspot.com"
+#root = "http://swansonbassign4.appspot.com"
 #root = "http://127.0.0.1:8080"
 
 snippets = [
@@ -56,13 +57,43 @@ snippets = [
             "startTime":20,
             "endTime":21
         }
+    ],
+    [
+        {
+            "title":"Wythecombe",
+            "videoID":"Z4Mfx59GA6I",
+            "startTime":72,
+            "endTime":90,
+            "notes": "When I started my first degree this building was still boarded up"
+        },
+        {
+            "title":"OMG Goats",
+            "videoID":"Z4Mfx59GA6I",
+            "startTime":178,
+            "endTime":182
+        },
+        {
+            "title":"KBVR-FM production studio",
+            "videoID":"FHKNBl1RxZc",
+            "startTime":236,
+            "endTime":250,
+            "notes": "I used to work here, with that guy"
+        },
+        {
+            "title":"This is the only building shown in the brochure",
+            "videoID":"5NZikvFrfEM",
+            "startTime":14,
+            "endTime":15,
+            "notes": "Aint that the truth, It's just a dorm"
+        }
     ]
 
 ]
 testPlaylists = [
-    {"title":"Playlist A", "creator":"a@mail.com"},
-    {"title": "Playlist B"},
-    {"title": "Playlist C", "creator": "a@mail.com"},
+    {"title":"Lookouts", "creator":"a@mail.com"},
+    {"title": "Super Truck"},
+    {"title": "Computerphile", "creator": "a@mail.com"},
+    {"title": "OSU Tour"}
 ]
 
 def sendCurl(st, data=None):
@@ -111,16 +142,4 @@ res = check_output(["curl", "%s/playlist.json"%root])
 print res
 playlist = [p['json'] for p in json.loads(res)][0]
 
-print "getting json of one snippet"
-res = sendCurl("%s%s"%(root,playlist))
-print res
-
-print  "updating values of a snippet"
-res = json.loads(res)
-snpturl = res['snippets'][0]['url']
-
-print snpturl
-
-res = sendCurl("-X PUT %s%s"%(root,snpturl),data={"title":"new title","startTime":40})
-print res
 
