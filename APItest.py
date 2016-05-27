@@ -108,21 +108,27 @@ class user:
 
 jack = user()
 jack.name = {"name":"JackABoy", "password":"jpass"}
-jack.playlists = testPlaylists[2:]
+jack.playlists = zip(testPlaylists[2:], snippets[2:])
 
 brandon = user()
 brandon.name = {"name":"Brandon", "password":"bpass"}
-brandon.playlists = testPlaylists[:2]
+brandon.playlists = zip(testPlaylists[:2], snippets[2:])
 users = [jack, brandon]
 
-def sendCurl(st, data=None):
+def sendCurl(st, data=None, headers=None):
 
     if data:
         data = ["--data", "\"%s\""%"&".join("%s=%s"%(k,v) for k,v in data.items())]
     else:
         data = []
 
-    args = ["curl"] + data + st.split(' ')
+    headArray = []
+    if headers:
+        for k,v in headers.items():
+            headArray.append("-H \"%s:%s\""%(k,v))
+
+
+    args = ["curl"] + headArray + data + st.split(' ')
     print "SENDING CURL CALL: ", " ".join(args)
     return  check_output(' '.join(args), shell=True)
 
@@ -134,6 +140,7 @@ print "Retrieving all existing playlists"
 res = check_output(["curl", "%s/playlist.json"%root])
 print res
 playlists = [p['url'] for p in json.loads(res)]
+print playlists
 
 ##create users###
 for u in users:
@@ -153,16 +160,19 @@ for u in users:
         u.tokenDir={"id":res["userid"], "token":res["token"]}
 
     #check their playlists
-    res = sendCurl()
+    #res = sendCurl()
 
 
-
+#create playlists
 for u in users:
-    for p in u.playlists:
-        p.update(u.tokenDir)
-        res = sendCurl("-X POST %s"%root, data=p)
+    for p,snpts in u.playlists:
+        res = sendCurl("-X POST %s"%root, data=p, headers=u.tokenDir)
         print res
         res = json.loads(res)
+        # purl = res['url']
+        #
+        # for s in snpts:
+        #     res = sendCurl("-X POST %s%s" % (root, purl), data=s)
 
 
 

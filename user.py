@@ -39,6 +39,7 @@ class RegHandler(webapp2.RequestHandler):
                             'userid': user.key.id(),
                             'token': user.create_auth_token(user.key.id())}
                            ))
+            self.response.write("\n")
             self.response.set_status(200)
             return
 
@@ -54,8 +55,6 @@ class LogHandler(webapp2.RequestHandler):
             jsonMsg(self.response, 'Missing required field')
             self.response.set_status(400, "Missing required field")
             return
-
-        print dir(auth.get_store())
 
         try:
             #user = auth.get_auth().get_user_by_password(name, passw, save_session=False)
@@ -80,14 +79,15 @@ class LogHandler(webapp2.RequestHandler):
                             'userid': user.key.id(),
                             'token': user.create_auth_token(user.key.id())}
                            ))
+            self.response.write("\n")
             self.response.set_status(200)
             return
 
 def validate_user(request):
     #print request.POST
 
-    id = request.POST.get('id')
-    token = request.POST.get('token')
+    id = request.headers.get('id')
+    token = request.headers.get('token')
 
     if not id or not token:
         print 'TOKEN AUTH ERROR: Missing required field'
