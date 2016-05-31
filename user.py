@@ -36,6 +36,7 @@ class RegHandler(webapp2.RequestHandler):
             print user
             self.response.write(
                 json.dumps({"msg": "User Created",
+                            'username': name,
                             'userid': user.key.id(),
                             'token': user.create_auth_token(user.key.id())}
                            ))
@@ -76,6 +77,7 @@ class LogHandler(webapp2.RequestHandler):
             print user
             self.response.write(
                 json.dumps({"msg": "User Logged In",
+                            'username': name,
                             'userid': user.key.id(),
                             'token': user.create_auth_token(user.key.id())}
                            ))
