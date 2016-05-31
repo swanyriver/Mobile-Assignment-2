@@ -87,12 +87,12 @@ class PlaylistRoute(PlaylistHandler):
 
     #add a snippet
     def postPlaylist(self, playlist):
-        print self.request.POST
+        #print self.request.POST
         if any((k not in self.request.POST or not self.request.POST[k] for k in
                 ("title", "videoID", "startTime", "endTime"))):
             return self.returnJSON(None, code=400, message="Required fields not included")
 
-        print models.getPopulateDictionary(models.Snippet, self.request.POST.items())
+        #print models.getPopulateDictionary(models.Snippet, self.request.POST.items())
 
         # validate videoID
         result = urlfetch.fetch("https://www.googleapis.com/youtube/v3/videos?id=%s&key=%s&part=id" % (
@@ -143,7 +143,7 @@ class SnippetRoute(Handler):
         if not snpt:
             return self.returnJSON(None, code=404)
 
-        print "SNPT PARENT >>> ", snpt.key.parent().parent()
+        #print "SNPT PARENT >>> ", snpt.key.parent().parent()
         user = validate_user(self.request)
         if not user or user.key != snpt.key.parent().parent():
             return self.returnJSON({"msg": "User Validation Failed"}, code=401)

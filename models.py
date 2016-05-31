@@ -52,9 +52,9 @@ class Snippet(ndb.Model):
         if cls.__name__ not in kwargs: return None
         try:
             skey = ndb.Key(urlsafe=kwargs[cls.__name__])
-            print skey
+            #print skey
             snpt = skey.get()
-            print snpt
+            #print snpt
         except:
             print sys.exc_info()[0]
             return None
@@ -113,9 +113,9 @@ class Playlist(ndb.Model):
         if cls.__name__ not in kwargs: return None
         try:
             pkey = ndb.Key(urlsafe=kwargs[cls.__name__])
-            print pkey
+            #print pkey
             plist = pkey.get()
-            print plist
+            #print plist
         except:
             print sys.exc_info()[0]
             return None
@@ -133,7 +133,7 @@ class Playlist(ndb.Model):
         newPlaylist.creator = user.auth_ids[0]
         newPlaylist.title = kv['title']
         newPlaylist.isPublic = "public" in kv
-        print newPlaylist
+        #print newPlaylist
 
         return newPlaylist.put()
 

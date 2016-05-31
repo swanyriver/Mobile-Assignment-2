@@ -47,7 +47,7 @@ class RegHandler(webapp2.RequestHandler):
 
 class LogHandler(webapp2.RequestHandler):
     def post(self):
-        print self.request.POST
+        #print self.request.POST
 
         name = self.request.POST.get('name')
         passw = self.request.POST.get('password')
@@ -74,7 +74,7 @@ class LogHandler(webapp2.RequestHandler):
             self.response.set_status(500)
             return
         else:
-            print user
+            #print user
             self.response.write(
                 json.dumps({"msg": "User Logged In",
                             'username': name,
@@ -87,6 +87,7 @@ class LogHandler(webapp2.RequestHandler):
 
 def validate_user(request):
     #print request.POST
+    print request.headers
 
     id = request.headers.get('id')
     token = request.headers.get('token')
