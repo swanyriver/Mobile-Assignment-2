@@ -139,7 +139,7 @@ class Playlist(ndb.Model):
 
     @classmethod
     def get_public_playlists(cls):
-        return [p._to_dict() for p in cls.query(Playlist.isPublic)]
+        return [p._to_dict() for p in cls.query(Playlist.isPublic == True)]
 
     @classmethod
     def get_users_playlists(cls, user):

@@ -31,14 +31,10 @@ json.dumps = prettyJson
 class allplaylistsJson(Handler):
     def get(self):
         user = validate_user(self.request)
-        if user:
-            return self.returnJSON(
-                json.dumps(models.Playlist.get_users_playlists(user))
-            )
+        if not user or "public" in self.request.GET:
+            return self.returnJSON(json.dumps(models.Playlist.get_public_playlists()))
         else:
-            return self.returnJSON(
-                json.dumps(models.Playlist.get_public_playlists())
-            )
+            return self.returnJSON(json.dumps(models.Playlist.get_users_playlists(user)))
 
 
 # create playlist or return all playlists html # / , /playlist/
