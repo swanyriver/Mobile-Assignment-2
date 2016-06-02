@@ -103,7 +103,7 @@ class Playlist(ndb.Model):
     #for html representation
     @staticmethod
     def getAllPublicsForHTML():
-        plists = Playlist.query(Playlist.isPublic == True)
+        plists = Playlist.query(Playlist.isPublic == True).order(-Playlist.date_added)
         for p in plists: p.snippets = ndb.get_multi(p.snippetKeys)
         return plists
 
@@ -139,9 +139,9 @@ class Playlist(ndb.Model):
 
     @classmethod
     def get_public_playlists(cls):
-        return [p._to_dict() for p in cls.query(Playlist.isPublic == True)]
+        return [p._to_dict() for p in cls.query(Playlist.isPublic == True).order(-cls.date_added)]
 
     @classmethod
     def get_users_playlists(cls, user):
-        return [p._to_dict() for p in cls.query(ancestor=user.key)]
+        return [p._to_dict() for p in cls.query(ancestor=user.key).order(-cls.date_added)]
 
