@@ -109,7 +109,7 @@ jack.playlists = zip(testPlaylists[:2], snippets[:2])
 brandon = user()
 brandon.name = {"name":"Brandon", "password":"bpass"}
 brandon.playlists = zip(testPlaylists[2:], snippets[2:])
-users = [jack, brandon]
+users = [jack]
 
 def sendCurl(st, data=None, headers=None):
 
@@ -165,84 +165,4 @@ for u in users:
     print "Expected no more playlist for user"
     print sendCurl(root + "/playlist.json", headers=u.tokenDir)
 
-print "Expected no more public playlists"
 print sendCurl(root + "/playlist.json")
-
-#create playlists
-for u in users:
-    for p,snpts in u.playlists:
-        res = sendCurl("-X POST %s"%root, data=p, headers=u.tokenDir)
-        print res
-        p.update(json.loads(res))
-
-        for s in snpts:
-            res = sendCurl("-X POST %s%s" % (root, p['url']), data=s, headers=u.tokenDir)
-            print res
-
-        #check playlist  #far too verbose
-        # print "Retrieveing %s playlist <%s> without auth"%("PUBLIC" if "public" in p else "", p["title"])
-        # res = sendCurl("%s%s"%(root, pjson))
-        # print res
-        # # res = sendCurl("%s%s"%(root,purl))
-        # # print res
-        #
-        # print "Retrieveing %s playlist <%s> with auth" % ("PUBLIC" if "public" in p else "", p["title"])
-        # res = sendCurl("%s%s" % (root, pjson), headers=u.tokenDir)
-        # print res
-        # # res = sendCurl("%s%s" % (root, purl), headers=u.tokenDir)
-        # # print res
-
-#check public playlists
-public_playlists = sendCurl(root + "/playlist.json")
-print "PUBLIC PLAYLISTS"
-print public_playlists
-check_output('google-chrome ' + root, shell=True)
-
-
-#test public/private GET of playlist HTML/JSON
-print "JACKS PlAYLISTS"
-print sendCurl(root + "/playlist.json", headers=jack.tokenDir)
-for p, snpts in jack.playlists:
-    check_output('google-chrome ' + root + p['url'], shell=True)
-    if "public" in p:
-        print "retrieve public playlist json without auth"
-        print sendCurl("%s%s"%(root, p['json']))
-    else:
-        print "retrieve PRIVATE playlist json without auth"
-        print sendCurl("%s%s" % (root, p['json']))
-
-        print "retrieve PRIVATE playlist json with wrong auth"
-        print sendCurl("%s%s" % (root, p['json']), headers=brandon.tokenDir)
-
-        print "retrieve PRIVATE playlist json with auth"
-        print sendCurl("%s%s" % (root, p['json']), headers=jack.tokenDir)
-
-
-#test put and delete for snippet
-p = jack.playlists[1][0]
-playlist = json.loads(sendCurl("%s%s" % (root, p['json']), headers=jack.tokenDir))
-#delete jacktruck clip
-snpturl = playlist['snippets'][1]['url']
-#unauth
-print sendCurl("-X DELETE %s%s" % (root, snpturl))
-#wrongAuth
-print sendCurl("-X DELETE %s%s" % (root, snpturl), headers=brandon.tokenDir)
-#correctAuth
-print sendCurl("-X DELETE %s%s" % (root, snpturl), headers=jack.tokenDir)
-#snippet doesnt exist
-print sendCurl("-X DELETE %s%s" % (root, snpturl), headers=jack.tokenDir)
-
-#modify last clip
-snpturl = playlist['snippets'][-1]['url']
-#unauth
-data = {"title":"Updated Title", "startTime":"870", "notes": "Updated noetes"}
-print sendCurl("-X PUT %s%s" % (root, snpturl), data=data)
-#wrongAuth
-print sendCurl("-X PUT %s%s" % (root, snpturl), headers=brandon.tokenDir, data=data)
-#correctAuth
-print sendCurl("-X PUT %s%s" % (root, snpturl), headers=jack.tokenDir, data=data)
-#snippet doesnt exist
-print sendCurl("-X PUT %s%s" % (root, snpturl), headers=jack.tokenDir, data=data)
-
-print sendCurl("%s%s" % (root, p['json']), headers=jack.tokenDir)
-check_output('google-chrome ' + root + p['url'], shell=True)
