@@ -147,7 +147,7 @@ class SnippetRoute(Handler):
         #update record
         snpt.populate(**models.getPopulateDictionary(models.Snippet, self.request.POST.items()))
         snpt.put()
-        return self.returnJSON(snpt.json(), code=200, message="snippet updated")
+        return self.returnJSON(json.dumps({"url":self.request.path, "snippet":json.loads(snpt.json())}), code=200, message="snippet updated")
 
 
     def delete(self, **kwargs):
